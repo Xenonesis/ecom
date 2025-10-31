@@ -81,6 +81,26 @@ export default function CheckoutPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Progress Indicator */}
+      <div className="mb-8">
+        <div className="flex items-center justify-center gap-2 sm:gap-4">
+          <div className="flex items-center">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">1</div>
+            <span className="ml-2 hidden sm:inline text-sm font-medium">Cart</span>
+          </div>
+          <div className="h-px w-12 sm:w-24 bg-primary"></div>
+          <div className="flex items-center">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">2</div>
+            <span className="ml-2 hidden sm:inline text-sm font-medium">Checkout</span>
+          </div>
+          <div className="h-px w-12 sm:w-24 bg-border"></div>
+          <div className="flex items-center">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground text-sm font-semibold">3</div>
+            <span className="ml-2 hidden sm:inline text-sm">Confirmation</span>
+          </div>
+        </div>
+      </div>
+
       <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
 
       <div className="grid gap-8 lg:grid-cols-3">
