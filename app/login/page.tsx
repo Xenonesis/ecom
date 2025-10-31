@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ShoppingBag, Mail, Lock, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useAuthStore } from '@/lib/store/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,13 +17,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const setUser = useAuthStore((state) => state.setUser)
+  const setUserRole = useAuthStore((state) => state.setUserRole)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -31,6 +34,21 @@ export default function LoginPage() {
       setError(signInError.message)
       setLoading(false)
       return
+    }
+
+    if (data.user) {
+      setUser(data.user)
+      
+      // Fetch and set user role
+      const { data: userData } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', data.user.id)
+        .single()
+      
+      if (userData) {
+        setUserRole(userData.role)
+      }
     }
 
     router.push('/')

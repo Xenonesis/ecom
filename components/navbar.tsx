@@ -19,9 +19,58 @@ export function Navbar() {
   const totalItems = useCartStore((state) => state.getTotalItems())
   const user = useAuthStore((state) => state.user)
   const userRole = useAuthStore((state) => state.userRole)
+  const setUser = useAuthStore((state) => state.setUser)
+  const setUserRole = useAuthStore((state) => state.setUserRole)
   const router = useRouter()
   const supabase = createClient()
   const { theme, setTheme } = useTheme()
+
+  // Initialize auth state
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser(session.user)
+        
+        // Fetch user role from database
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+        
+        if (userData) {
+          setUserRole(userData.role)
+        }
+      }
+    }
+    
+    initAuth()
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user)
+        
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+        
+        if (userData) {
+          setUserRole(userData.role)
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+        setUserRole(null)
+      }
+    })
+    
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase, setUser, setUserRole])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +82,8 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    setUser(null)
+    setUserRole(null)
     router.push('/')
     router.refresh()
   }
