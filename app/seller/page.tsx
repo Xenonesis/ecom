@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export default async function SellerDashboard() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   

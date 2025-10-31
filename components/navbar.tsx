@@ -168,6 +168,12 @@ export function Navbar() {
                       </DropdownMenuItem>
                     </Link>
                   )}
+                  <Link href="/profile">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      My Profile
+                    </DropdownMenuItem>
+                  </Link>
                   <Link href="/orders">
                     <DropdownMenuItem>
                       <ShoppingCart className="mr-2 h-4 w-4" />
@@ -242,6 +248,9 @@ export function Navbar() {
               <hr className="border-border" />
               {user ? (
                 <>
+                  <Link href="/profile" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+                    My Profile
+                  </Link>
                   <Link href="/orders" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
                     My Orders
                   </Link>

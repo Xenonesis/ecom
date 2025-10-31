@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Edit, Trash } from 'lucide-react'
 
 export default async function SellerProductsPage() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   

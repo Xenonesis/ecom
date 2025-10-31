@@ -13,7 +13,7 @@ interface Props {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   
   const { data: product } = await supabase
     .from('products')
