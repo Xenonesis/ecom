@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,13 +24,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        
-        {/* Enhanced Footer */}
-        <footer className="border-t bg-muted/30">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          
+          {/* Enhanced Footer */}
+          <footer className="border-t bg-muted/30">
           <div className="container mx-auto px-4 py-12">
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
               {/* Brand */}
@@ -163,6 +170,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        </ThemeProvider>
       </body>
     </html>
   );

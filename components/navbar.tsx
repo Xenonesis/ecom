@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, User, Search, Menu, X, LogOut, Package, Heart, Settings } from 'lucide-react'
+import { ShoppingCart, User, Search, Menu, X, LogOut, Package, Heart, Settings, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -20,6 +21,7 @@ export function Navbar() {
   const userRole = useAuthStore((state) => state.userRole)
   const router = useRouter()
   const supabase = createClient()
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,6 +71,15 @@ export function Navbar() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="hover:bg-accent"
+              >
+                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
+              
               <Link href="/cart" className="hidden sm:block">
                 <Button variant="ghost" size="icon" className="relative hover:bg-accent">
                   <ShoppingCart className="h-5 w-5" />
