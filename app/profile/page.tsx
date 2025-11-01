@@ -36,14 +36,15 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!user) {
-        router.push('/login')
-        return
-      }
-
       try {
         const response = await fetch('/api/profile')
         if (!response.ok) {
+          if (response.status === 401) {
+            // User is not authenticated, middleware should have redirected
+            // but if we're here, redirect to login
+            router.push('/login')
+            return
+          }
           throw new Error('Failed to fetch profile')
         }
         const data = await response.json()
@@ -61,7 +62,7 @@ export default function ProfilePage() {
     }
 
     loadProfile()
-  }, [user, router])
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
