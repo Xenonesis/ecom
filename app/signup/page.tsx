@@ -51,6 +51,23 @@ export default function SignupPage() {
       return
     }
 
+    // Check if email already exists
+    try {
+      const { data: existingUsers } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email)
+        .single()
+
+      if (existingUsers) {
+        setError('An account with this email already exists')
+        setLoading(false)
+        return
+      }
+    } catch (checkError) {
+      // If no user found, that's fine - continue with signup
+    }
+
     // Sign up user
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -79,7 +96,8 @@ export default function SignupPage() {
       })
 
       if (profileError) {
-        setError(profileError.message)
+        console.error('Profile creation error:', profileError)
+        setError('Account created but profile setup failed. Please contact support.')
         setLoading(false)
         return
       }

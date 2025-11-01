@@ -9,6 +9,7 @@ import { useAuthStore } from '@/lib/store/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Database } from '@/lib/supabase/database.types'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -25,35 +26,66 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (signInError) {
-      setError(signInError.message)
-      setLoading(false)
-      return
-    }
+      if (signInError) {
+        setError(signInError.message)
+        setLoading(false)
+        return
+      }
 
-    if (data.user) {
+      if (!data.user) {
+        setError('Login failed. Please try again.')
+        setLoading(false)
+        return
+      }
+
+      // Set user in auth store
       setUser(data.user)
-      
+
       // Fetch and set user role
-      const { data: userData } = await supabase
+      const { data: userData, error: roleError } = await supabase
         .from('users')
         .select('role')
         .eq('id', data.user.id)
         .single()
-      
-      if (userData) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setUserRole((userData as any).role)
-      }
-    }
 
-    router.push('/')
-    router.refresh()
+      if (roleError) {
+        console.error('Error fetching user role:', roleError)
+        setError('Account setup incomplete. Please contact support.')
+        await supabase.auth.signOut()
+        setLoading(false)
+        return
+      }
+
+      // Type assertion for Supabase response
+      const typedUserData = userData as { role: 'customer' | 'seller' | 'admin' } | null
+
+      if (!typedUserData?.role) {
+        setError('User profile not found. Please contact support.')
+        await supabase.auth.signOut()
+        setLoading(false)
+        return
+      }
+
+      // Set user role
+      setUserRole(typedUserData.role)
+
+      // Navigate to home page
+      router.push('/')
+      router.refresh()
+      
+      // Reset loading state after a short delay to allow navigation
+      setTimeout(() => setLoading(false), 500)
+    } catch (error) {
+      console.error('Unexpected error during login:', error)
+      setError('An unexpected error occurred. Please try again.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -76,7 +108,7 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               {error && (
                 <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 flex items-start gap-2 animate-fadeIn">
-                  <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                   <p className="text-sm text-destructive">{error}</p>
                 </div>
               )}

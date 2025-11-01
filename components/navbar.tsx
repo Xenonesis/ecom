@@ -34,17 +34,20 @@ export function Navbar() {
         setUser(session.user)
         
         // Fetch user role from database
-        const { data } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', session.user.id)
-          .single()
+        try {
+          const { data: userData, error: roleError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', session.user.id)
+            .single()
 
-        const userData: Database['public']['Tables']['users']['Row'] | null = data
-        
-        if (userData) {
-          const typedUserData = userData as Database['public']['Tables']['users']['Row']
-          setUserRole(typedUserData.role)
+          if (roleError) {
+            console.error('Error fetching user role:', roleError)
+          } else if (userData && (userData as any).role) {
+            setUserRole((userData as any).role)
+          }
+        } catch (error) {
+          console.error('Error during auth initialization:', error)
         }
       }
     }
@@ -55,18 +58,21 @@ export function Navbar() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
-        
-        const { data } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', session.user.id)
-          .single()
 
-        const userData: Database['public']['Tables']['users']['Row'] | null = data
-        
-        if (userData) {
-          const typedUserData = userData as Database['public']['Tables']['users']['Row']
-          setUserRole(typedUserData.role)
+        try {
+          const { data: userData, error: roleError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', session.user.id)
+            .single()
+
+          if (roleError) {
+            console.error('Error fetching user role on sign in:', roleError)
+          } else if (userData && (userData as any).role) {
+            setUserRole((userData as any).role)
+          }
+        } catch (error) {
+          console.error('Error during auth state change:', error)
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
