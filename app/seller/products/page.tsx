@@ -44,7 +44,7 @@ export default async function SellerProductsPage() {
                     <div className="mt-2 flex gap-4 text-sm">
                       <span>Price: ₹{product.price}</span>
                       <span>Stock: {product.stock}</span>
-                      <span>Rating: {product.rating.toFixed(1)}</span>
+                      <span>Rating: {(product.rating || 0).toFixed(1)}</span>
                     </div>
                   </div>
                   <div className="flex gap-2">

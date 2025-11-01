@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { ArrowRight, ShoppingBag, Shield, Truck, Zap, Award, HeadphonesIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
-import { HeroCarousel } from '@/components/hero-carousel'
 import { CategoryIcons } from '@/components/category-icons'
 import { createServerClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/database.types'
@@ -19,22 +18,17 @@ export default async function Home() {
 
   const products: Database['public']['Tables']['products']['Row'][] = data || []
 
-  // Fetch active promotions for carousel
-  const { data: promotions } = await supabase
-    .from('promotions')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-    .limit(5)
+  // // Fetch active promotions for carousel
+  // const { data: promotions } = await supabase
+  //   .from('promotions')
+  //   .select('*')
+  //   .eq('is_active', true)
+  //   .order('display_order', { ascending: true })
+  //   .limit(5)
 
   return (
     <div className="flex flex-col">
-      {/* Hero Carousel Section */}
-      {promotions && promotions.length > 0 && (
-        <section className="container mx-auto px-4 py-8">
-          <HeroCarousel promotions={promotions} />
-        </section>
-      )}
+
 
       {/* Category Icons */}
       <section className="container mx-auto px-4 py-8">

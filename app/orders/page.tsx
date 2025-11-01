@@ -54,7 +54,7 @@ export default async function OrdersPage() {
               <CardContent>
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    Ordered on {formatDate(order.created_at)}
+                    Ordered on {order.created_at ? formatDate(order.created_at) : 'Unknown date'}
                   </p>
                   <p className="text-lg font-semibold">
                     Total: {formatPrice(Number(order.total_amount))}

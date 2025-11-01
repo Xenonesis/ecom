@@ -14,6 +14,7 @@ CREATE TABLE users (
     verified BOOLEAN DEFAULT false,
     avatar_url TEXT,
     phone TEXT,
+    theme_preference TEXT DEFAULT 'system' CHECK (theme_preference IN ('light', 'dark', 'system')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -166,6 +167,19 @@ CREATE TABLE review_images (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Notifications table
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('order', 'cart', 'wishlist', 'review', 'system')),
+    is_read BOOLEAN DEFAULT false,
+    data JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_products_seller ON products(seller_id);
 CREATE INDEX idx_products_category ON products(category);
@@ -181,6 +195,8 @@ CREATE INDEX idx_coupons_active ON coupons(is_active);
 CREATE INDEX idx_loyalty_points_user ON loyalty_points(user_id);
 CREATE INDEX idx_product_questions_product ON product_questions(product_id);
 CREATE INDEX idx_review_images_review ON review_images(review_id);
+CREATE INDEX idx_notifications_user ON notifications(user_id);
+CREATE INDEX idx_notifications_read ON notifications(is_read);
 
 -- Row Level Security (RLS) Policies
 
@@ -198,6 +214,9 @@ ALTER TABLE loyalty_points ENABLE ROW LEVEL SECURITY;
 ALTER TABLE points_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE product_questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE review_images ENABLE ROW LEVEL SECURITY;
+
+-- Notifications table
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- Users policies
 CREATE POLICY "Users can view own profile" ON users FOR SELECT USING (auth.uid() = id);
@@ -288,6 +307,11 @@ CREATE POLICY "Users can add images to own reviews" ON review_images FOR INSERT 
 CREATE POLICY "Users can delete images from own reviews" ON review_images FOR DELETE USING (
     EXISTS (SELECT 1 FROM reviews WHERE id = review_images.review_id AND user_id = auth.uid())
 );
+
+-- Notifications policies
+CREATE POLICY "Users can view own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "System can create notifications" ON notifications FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can update own notifications" ON notifications FOR UPDATE USING (auth.uid() = user_id);
 
 -- Function to update product rating
 CREATE OR REPLACE FUNCTION update_product_rating()

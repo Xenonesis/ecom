@@ -18,23 +18,23 @@ interface Product {
   name: string
   description: string
   price: number
-  discount: number
+  discount: number | null
   stock: number
-  images: string[]
-  rating: number
+  images: string[] | null
+  rating: number | null
   category: string
-  seller_id: string
+  seller_id: string | null
 }
 
 interface Review {
   id: string
-  user_id: string
+  user_id: string | null
   rating: number
-  comment: string
-  created_at: string
+  comment: string | null
+  created_at: string | null
   users: {
     name: string
-  }
+  } | null
 }
 
 interface Props {
@@ -50,7 +50,7 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
   const router = useRouter()
 
-  const discountedPrice = product.price - (product.price * product.discount) / 100
+  const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100
   const totalPrice = discountedPrice * quantity
 
   const addToCart = async () => {
@@ -149,20 +149,20 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
         <div className="space-y-4">
           <div className="relative aspect-square overflow-hidden rounded-xl border-2">
             <Image
-              src={product.images[selectedImage] || '/placeholder.svg'}
+              src={product.images?.[selectedImage] || '/placeholder.svg'}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
               className="object-cover"
               priority
             />
-            {product.discount > 0 && (
+            {(product.discount || 0) > 0 && (
               <Badge className="absolute left-4 top-4 bg-red-500 hover:bg-red-600 text-base px-3 py-1">
                 {product.discount}% OFF
               </Badge>
             )}
           </div>
-          {product.images.length > 1 && (
+          {product.images && product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-3">
               {product.images.slice(0, 4).map((image: string, index: number) => (
                 <button
@@ -195,7 +195,7 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
                   <Star
                     key={i}
                     className={`h-5 w-5 ${
-                      i < Math.floor(product.rating)
+                      i < Math.floor(product.rating || 0)
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'fill-gray-200 text-gray-200'
                     }`}
@@ -203,14 +203,14 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">
-                {product.rating.toFixed(1)} ({reviews.length} reviews)
+                {(product.rating || 0).toFixed(1)} ({reviews.length} reviews)
               </span>
             </div>
           </div>
 
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-primary">₹{discountedPrice.toFixed(2)}</span>
-            {product.discount > 0 && (
+            {(product.discount || 0) > 0 && (
               <>
                 <span className="text-2xl text-muted-foreground line-through">
                   ₹{product.price.toFixed(2)}
@@ -391,7 +391,7 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
                         </div>
                         <p className="mt-2 text-muted-foreground">{review.comment}</p>
                         <p className="mt-2 text-xs text-muted-foreground">
-                          {new Date(review.created_at).toLocaleDateString()}
+                          {review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Unknown date'}
                         </p>
                       </div>
                     </div>

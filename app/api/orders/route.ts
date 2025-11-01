@@ -114,5 +114,14 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Create notification for order status update
+  try {
+    const { notificationManager } = await import('@/lib/supabase/notifications')
+    await notificationManager.createOrderNotification(order.user_id, order.id, status)
+  } catch (notificationError) {
+    console.error('Failed to create order notification:', notificationError)
+    // Don't fail the request if notification creation fails
+  }
+
   return NextResponse.json({ order })
 }

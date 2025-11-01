@@ -45,7 +45,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    const { name, phone, avatar_url } = body
+    const { name, phone, avatar_url, theme_preference } = body
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: profile, error: updateError } = await (supabase as any)
@@ -54,6 +54,7 @@ export async function PUT(request: Request) {
         name,
         phone,
         avatar_url,
+        theme_preference,
       })
       .eq('id', user.id)
       .select()

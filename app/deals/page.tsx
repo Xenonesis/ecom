@@ -13,13 +13,15 @@ interface Product {
   id: string
   name: string
   price: number
-  discount: number
-  image_url: string
+  discount: number | null
+  images: string[] | null
   description: string
-  images?: string[]
-  rating?: number
-  seller_id?: string
+  rating?: number | null
+  seller_id?: string | null
   stock?: number
+  category: string
+  created_at: string | null
+  updated_at: string | null
 }
 
 export default function DealsPage() {
@@ -51,14 +53,16 @@ export default function DealsPage() {
   }, [supabase])
 
   const filteredProducts = products.filter(product => {
-    if (filter === 'high') return product.discount >= 30
-    if (filter === 'medium') return product.discount >= 15 && product.discount < 30
+    const discount = product.discount || 0
+    if (filter === 'high') return discount >= 30
+    if (filter === 'medium') return discount >= 15 && discount < 30
     return true
   })
 
   const calculateSavings = () => {
     return filteredProducts.reduce((sum, product) => {
-      const savings = (product.price * product.discount) / 100
+      const discount = product.discount || 0
+      const savings = (product.price * discount) / 100
       return sum + savings
     }, 0)
   }
@@ -86,17 +90,18 @@ export default function DealsPage() {
         {!loading && products.length > 0 && (
           <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
             {products
-              .filter(p => p.discount >= 30)
+              .filter(p => (p.discount || 0) >= 30)
               .slice(0, 4)
               .map((product) => (
                 <ProductCard 
                   key={product.id} 
                   product={{
                     ...product,
-                    images: product.images || [product.image_url],
+                    images: product.images || [],
                     rating: product.rating || 0,
                     seller_id: product.seller_id || '',
-                    stock: product.stock || 0
+                    stock: product.stock || 0,
+                    discount: product.discount || 0
                   }} 
                 />
               ))
@@ -121,7 +126,7 @@ export default function DealsPage() {
           </div>
           <div className="rounded-lg bg-white/10 p-4 backdrop-blur">
             <div className="text-2xl font-bold">
-              {Math.max(...products.map(p => p.discount), 0)}%
+              {Math.max(...products.map(p => p.discount || 0), 0)}%
             </div>
             <div className="text-sm opacity-90">Max Discount</div>
           </div>
@@ -160,7 +165,7 @@ export default function DealsPage() {
           <TrendingDown className="h-4 w-4" />
           30% & Above
           <Badge variant="secondary" className="ml-1">
-            {products.filter(p => p.discount >= 30).length}
+            {products.filter(p => (p.discount || 0) >= 30).length}
           </Badge>
         </button>
         
@@ -175,7 +180,7 @@ export default function DealsPage() {
           <Badge className="h-4 w-4" />
           15% - 29%
           <Badge variant="secondary" className="ml-1">
-            {products.filter(p => p.discount >= 15 && p.discount < 30).length}
+            {products.filter(p => (p.discount || 0) >= 15 && (p.discount || 0) < 30).length}
           </Badge>
         </button>
       </div>
@@ -205,10 +210,11 @@ export default function DealsPage() {
               key={product.id} 
               product={{
                 ...product,
-                images: product.images || [product.image_url],
+                images: product.images || [],
                 rating: product.rating || 0,
                 seller_id: product.seller_id || '',
-                stock: product.stock || 0
+                stock: product.stock || 0,
+                discount: product.discount || 0
               }} 
             />
           ))}

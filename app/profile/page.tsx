@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, Mail, Phone, Shield, Calendar, Save, Loader2, AlertCircle, CheckCircle2, Package, Heart, ShoppingBag, Eye, Trash2, Star } from 'lucide-react'
+import { User, Mail, Phone, Shield, Calendar, Save, Loader2, AlertCircle, CheckCircle2, Package, Heart, ShoppingBag, Eye, Trash2, Star, Palette } from 'lucide-react'
 import { useAuthStore } from '@/lib/store/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface UserProfile {
   id: string
@@ -21,6 +24,7 @@ interface UserProfile {
   verified: boolean
   avatar_url?: string
   phone?: string
+  theme_preference?: string
   created_at: string
 }
 
@@ -57,9 +61,11 @@ export default function ProfilePage() {
     name: '',
     phone: '',
     avatar_url: '',
+    theme_preference: 'system',
   })
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
+  const { setTheme } = useTheme()
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -78,7 +84,13 @@ export default function ProfilePage() {
           name: data.name || '',
           phone: data.phone || '',
           avatar_url: data.avatar_url || '',
+          theme_preference: data.theme_preference || 'system',
         })
+        
+        // Apply the saved theme preference
+        if (data.theme_preference) {
+          setTheme(data.theme_preference)
+        }
 
         // Fetch orders
         const ordersResponse = await fetch('/api/orders')
@@ -125,6 +137,11 @@ export default function ProfilePage() {
       const updatedProfile = await response.json()
       setProfile(updatedProfile)
       setSuccess('Profile updated successfully!')
+      
+      // Apply the theme change immediately
+      if (formData.theme_preference) {
+        setTheme(formData.theme_preference)
+      }
       
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000)
@@ -331,6 +348,27 @@ export default function ProfilePage() {
                     <p className="text-xs text-muted-foreground">Enter a URL to your profile picture</p>
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="theme_preference" className="text-sm font-medium flex items-center gap-2">
+                      <Palette className="h-4 w-4" />
+                      Theme Preference
+                    </Label>
+                    <Select
+                      value={formData.theme_preference}
+                      onValueChange={(value) => setFormData({ ...formData, theme_preference: value })}
+                    >
+                      <SelectTrigger id="theme_preference">
+                        <SelectValue placeholder="Select theme" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">Light</SelectItem>
+                        <SelectItem value="dark">Dark</SelectItem>
+                        <SelectItem value="system">System</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">Choose your preferred color theme</p>
+                  </div>
+
                   <div className="flex gap-3 pt-4">
                     <Button type="submit" disabled={saving} className="flex-1">
                       {saving ? (
@@ -353,6 +391,7 @@ export default function ProfilePage() {
                           name: profile.name || '',
                           phone: profile.phone || '',
                           avatar_url: profile.avatar_url || '',
+                          theme_preference: profile.theme_preference || 'system',
                         })
                         setError(null)
                         setSuccess(null)

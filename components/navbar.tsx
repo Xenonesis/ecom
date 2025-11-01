@@ -2,17 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, User, Menu, X, LogOut, Package, Heart, Settings, Moon, Sun } from 'lucide-react'
+import { ShoppingCart, User, Menu, X, LogOut, Package, Heart, Settings, Moon, Sun, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { SearchAutocomplete } from '@/components/search-autocomplete'
-import { MegaMenu } from '@/components/mega-menu'
+import { Notifications } from '@/components/notifications'
 import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
+
+interface UserData {
+  role: 'customer' | 'seller' | 'admin' | null
+}
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -25,6 +29,12 @@ export function Navbar() {
   const router = useRouter()
   const supabase = createClient()
   const { theme, setTheme } = useTheme()
+
+  const getThemeIcon = () => {
+    if (theme === 'dark') return <Moon className="h-5 w-5" />
+    if (theme === 'light') return <Sun className="h-5 w-5" />
+    return <Monitor className="h-5 w-5" />
+  }
 
   // Initialize auth state
   useEffect(() => {
@@ -43,8 +53,8 @@ export function Navbar() {
 
           if (roleError) {
             console.error('Error fetching user role:', roleError)
-          } else if (userData && (userData as any).role) {
-            setUserRole((userData as any).role)
+          } else if (userData && (userData as UserData).role) {
+            setUserRole((userData as UserData).role)
           }
         } catch (error) {
           console.error('Error during auth initialization:', error)
@@ -68,8 +78,8 @@ export function Navbar() {
 
           if (roleError) {
             console.error('Error fetching user role on sign in:', roleError)
-          } else if (userData && (userData as any).role) {
-            setUserRole((userData as any).role)
+          } else if (userData && (userData as UserData).role) {
+            setUserRole((userData as UserData).role)
           }
         } catch (error) {
           console.error('Error during auth state change:', error)
@@ -103,7 +113,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className={`sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-shadow ${scrolled ? 'shadow-md' : ''}`}>
+      <nav className={`sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-shadow ${scrolled ? 'shadow-md' : ''}`}>
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
@@ -111,7 +121,9 @@ export function Navbar() {
                 ShopHub
               </Link>
               <div className="hidden lg:flex items-center gap-6">
-                <MegaMenu />
+                <Link href="/categories" className="text-sm font-medium hover:text-primary transition-colors">
+                  Categories
+                </Link>
                 <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
                   Products
                 </Link>
@@ -129,12 +141,17 @@ export function Navbar() {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={() => {
+                  if (theme === 'light') setTheme('dark')
+                  else if (theme === 'dark') setTheme('system')
+                  else setTheme('light')
+                }}
                 className="hover:bg-accent"
+                title={`Current theme: ${theme || 'system'}`}
               >
-                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {getThemeIcon()}
               </Button>
-              
+
               <Link href="/cart" className="hidden sm:block">
                 <Button variant="ghost" size="icon" className="relative hover:bg-accent">
                   <ShoppingCart className="h-5 w-5" />
@@ -145,6 +162,8 @@ export function Navbar() {
                   )}
                 </Button>
               </Link>
+
+              {user && <Notifications />}
 
               {user ? (
                 <DropdownMenu

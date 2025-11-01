@@ -14,10 +14,10 @@ interface Product {
   id: string
   name: string
   price: number
-  discount: number
-  images: string[]
-  rating: number
-  seller_id: string
+  discount: number | null
+  images: string[] | null
+  rating: number | null
+  seller_id: string | null
   stock: number
 }
 
@@ -30,7 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [adding, setAdding] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
-  const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
+  const discountedPrice = calculateDiscountedPrice(product.price, product.discount || 0)
 
   const handleAddToCart = async () => {
     setAdding(true)
@@ -38,10 +38,10 @@ export function ProductCard({ product }: ProductCardProps) {
       product_id: product.id,
       name: product.name,
       price: product.price,
-      discount: product.discount,
+      discount: product.discount || 0,
       quantity: 1,
-      image: product.images[0] || '/placeholder.svg',
-      seller_id: product.seller_id,
+      image: product.images?.[0] || '/placeholder.svg',
+      seller_id: product.seller_id || '',
     })
     
     // Simulate a brief loading state for better UX
@@ -58,13 +58,13 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
-            src={product.images[0] || '/placeholder.svg'}
+            src={product.images?.[0] || '/placeholder.svg'}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-110"
           />
-          {product.discount > 0 && (
+          {(product.discount || 0) > 0 && (
             <Badge className="absolute left-2 top-2 bg-red-500 hover:bg-red-600">
               {product.discount}% OFF
             </Badge>
@@ -113,17 +113,17 @@ export function ProductCard({ product }: ProductCardProps) {
             {[...Array(5)].map((_, i) => (
               <Star 
                 key={i}
-                className={`h-3.5 w-3.5 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`}
+                className={`h-3.5 w-3.5 ${i < Math.floor(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`}
               />
             ))}
           </div>
           <span className="text-xs text-muted-foreground ml-1">
-            ({product.rating.toFixed(1)})
+            ({(product.rating || 0).toFixed(1)})
           </span>
         </div>
         <div className="mt-3 flex items-baseline gap-2">
           <span className="text-xl font-bold text-primary">{formatPrice(discountedPrice)}</span>
-          {product.discount > 0 && (
+          {(product.discount || 0) > 0 && (
             <span className="text-sm text-muted-foreground line-through">
               {formatPrice(product.price)}
             </span>

@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { realtimeManager } from '@/lib/supabase/realtime'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
 export interface CartItem {
   product_id: string
@@ -15,14 +17,17 @@ interface CartStore {
   items: CartItem[]
   isLoading: boolean
   recommendations: CartItem[]
+  realtimeChannel: RealtimeChannel | null
   addItem: (item: CartItem) => void
   removeItem: (product_id: string) => void
   updateQuantity: (product_id: string, quantity: number) => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
-  syncWithDatabase: (userId: string) => Promise<void>
+  syncWithDatabase: () => Promise<void>
   loadRecommendations: (productIds: string[]) => Promise<void>
+  subscribeToRealtime: (userId: string) => void
+  unsubscribeFromRealtime: () => void
 }
 
 export const useCartStore = create<CartStore>()(
@@ -31,6 +36,7 @@ export const useCartStore = create<CartStore>()(
       items: [],
       isLoading: false,
       recommendations: [],
+      realtimeChannel: null,
       addItem: (item) =>
         set((state) => {
           const existingItem = state.items.find((i) => i.product_id === item.product_id)
@@ -67,14 +73,14 @@ export const useCartStore = create<CartStore>()(
           return sum + discountedPrice * item.quantity
         }, 0)
       },
-      syncWithDatabase: async (userId: string) => {
+      syncWithDatabase: async () => {
         set({ isLoading: true })
         try {
           // Load cart from database
           const response = await fetch('/api/cart')
           if (response.ok) {
             const { items: dbItems } = await response.json()
-            const cartItems: CartItem[] = dbItems.map((item: any) => ({
+            const cartItems: CartItem[] = dbItems.map((item: { product: { name: string; price: number; discount: number; images: string[]; seller_id: string }; quantity: number; product_id: string }) => ({
               product_id: item.product_id,
               name: item.product.name,
               price: item.product.price,
@@ -99,7 +105,7 @@ export const useCartStore = create<CartStore>()(
           const response = await fetch(`/api/products?recommendations=${productIds.join(',')}&limit=4`)
           if (response.ok) {
             const { products } = await response.json()
-            const recommendations: CartItem[] = products.map((product: any) => ({
+            const recommendations: CartItem[] = products.map((product: { id: string; name: string; price: number; discount: number; images: string[]; seller_id: string }) => ({
               product_id: product.id,
               name: product.name,
               price: product.price,
@@ -112,6 +118,29 @@ export const useCartStore = create<CartStore>()(
           }
         } catch (error) {
           console.error('Failed to load recommendations:', error)
+        }
+      },
+      subscribeToRealtime: (userId: string) => {
+        // Unsubscribe from existing channel if any
+        const { realtimeChannel } = get()
+        if (realtimeChannel) {
+          realtimeManager.unsubscribe(`cart:${userId}`)
+        }
+
+        // Subscribe to cart changes
+        const channel = realtimeManager.subscribeToCart(userId, (payload) => {
+          console.log('Cart realtime update:', payload)
+          // Re-sync cart when changes occur
+          get().syncWithDatabase()
+        })
+
+        set({ realtimeChannel: channel })
+      },
+      unsubscribeFromRealtime: () => {
+        const { realtimeChannel } = get()
+        if (realtimeChannel) {
+          realtimeManager.unsubscribeAll()
+          set({ realtimeChannel: null })
         }
       },
     }),
