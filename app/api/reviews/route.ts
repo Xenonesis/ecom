@@ -58,7 +58,8 @@ export async function POST(request: Request) {
     )
   }
 
-  const { data: review, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: review, error } = await (supabase as any)
     .from('reviews')
     .insert({
       user_id: user.id,
@@ -100,7 +101,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Review ID required' }, { status: 400 })
   }
 
-  const { data: review, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: review, error } = await (supabase as any)
     .from('reviews')
     .update({ rating, comment })
     .eq('id', id)

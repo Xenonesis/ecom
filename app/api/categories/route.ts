@@ -20,12 +20,15 @@ export async function GET() {
 
   // Group by category
   const categoryMap = new Map<string, { count: number; image: string }>()
-  
-  for (const product of products) {
-    const existing = categoryMap.get(product.category) || { count: 0, image: '' }
-    categoryMap.set(product.category, {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const product of (products as any[])) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existing = categoryMap.get((product as any).category) || { count: 0, image: '' }
+    categoryMap.set((product as any).category, {
       count: existing.count + 1,
-      image: existing.image || product.images?.[0] || ''
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      image: existing.image || (product as any).images?.[0] || ''
     })
   }
 

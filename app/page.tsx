@@ -3,16 +3,19 @@ import { ArrowRight, ShoppingBag, Shield, Truck, Zap, Award, HeadphonesIcon } fr
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import { createServerClient } from '@/lib/supabase/server'
+import { Database } from '@/lib/supabase/database.types'
 
 export default async function Home() {
   const supabase = await createServerClient()
   
   // Fetch featured products
-  const { data: products } = await supabase
+  const { data } = await supabase
     .from('products')
     .select('*')
     .limit(8)
     .order('created_at', { ascending: false })
+
+  const products: Database['public']['Tables']['products']['Row'][] = data || []
 
   return (
     <div className="flex flex-col">

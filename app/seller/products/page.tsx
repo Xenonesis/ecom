@@ -4,6 +4,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Edit, Trash } from 'lucide-react'
+import { Database } from '@/lib/supabase/database.types'
 
 export default async function SellerProductsPage() {
   const supabase = await createServerClient()
@@ -14,11 +15,13 @@ export default async function SellerProductsPage() {
     redirect('/login')
   }
 
-  const { data: products } = await supabase
+  const { data } = await supabase
     .from('products')
     .select('*')
     .eq('seller_id', user.id)
     .order('created_at', { ascending: false })
+
+  const products: Database['public']['Tables']['products']['Row'][] = data || []
 
   return (
     <div className="container mx-auto px-4 py-8">

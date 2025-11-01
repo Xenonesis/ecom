@@ -12,6 +12,7 @@ import { useAuthStore } from '@/lib/store/auth'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
+import { Database } from '@/lib/supabase/database.types'
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -33,14 +34,17 @@ export function Navbar() {
         setUser(session.user)
         
         // Fetch user role from database
-        const { data: userData } = await supabase
+        const { data } = await supabase
           .from('users')
           .select('role')
           .eq('id', session.user.id)
           .single()
+
+        const userData: Database['public']['Tables']['users']['Row'] | null = data
         
         if (userData) {
-          setUserRole(userData.role)
+          const typedUserData = userData as Database['public']['Tables']['users']['Row']
+          setUserRole(typedUserData.role)
         }
       }
     }
@@ -52,14 +56,17 @@ export function Navbar() {
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
         
-        const { data: userData } = await supabase
+        const { data } = await supabase
           .from('users')
           .select('role')
           .eq('id', session.user.id)
           .single()
+
+        const userData: Database['public']['Tables']['users']['Row'] | null = data
         
         if (userData) {
-          setUserRole(userData.role)
+          const typedUserData = userData as Database['public']['Tables']['users']['Row']
+          setUserRole(typedUserData.role)
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null)

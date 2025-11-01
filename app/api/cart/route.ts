@@ -56,10 +56,13 @@ export async function POST(request: Request) {
 
   if (existing) {
     // Update quantity
-    const { data, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
       .from('cart')
-      .update({ quantity: existing.quantity + quantity })
-      .eq('id', existing.id)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update({ quantity: (existing as any).quantity + quantity })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq('id', (existing as any).id)
       .select()
       .single()
 
@@ -71,7 +74,8 @@ export async function POST(request: Request) {
   }
 
   // Add new item
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
     .from('cart')
     .insert({ user_id: user.id, product_id, quantity })
     .select()
@@ -105,7 +109,8 @@ export async function PATCH(request: Request) {
     )
   }
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
     .from('cart')
     .update({ quantity })
     .eq('id', cart_id)

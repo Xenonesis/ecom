@@ -14,11 +14,11 @@ export default async function AdminDashboard() {
 
   const { data: userProfile } = await supabase
     .from('users')
-    .select('*')
+    .select('role, name')
     .eq('id', user.id)
     .single()
 
-  if (!userProfile || userProfile.role !== 'admin') {
+  if (!userProfile || (userProfile as { role: string; name: string }).role !== 'admin') {
     redirect('/')
   }
 
@@ -39,7 +39,7 @@ export default async function AdminDashboard() {
     .from('orders')
     .select('total_amount')
 
-  const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
+  const totalRevenue = (orders as { total_amount: number }[] | null)?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
 
   // Fetch pending sellers
   const { data: pendingSellers } = await supabase
@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {userProfile.name}!</p>
+        <p className="text-muted-foreground">Welcome back, {(userProfile as { role: string; name: string }).name}!</p>
       </div>
 
       {/* Stats */}
@@ -106,7 +106,7 @@ export default async function AdminDashboard() {
         <CardContent>
           {pendingSellers && pendingSellers.length > 0 ? (
             <div className="space-y-4">
-              {pendingSellers.map((seller) => (
+              {(pendingSellers as { id: string; name: string; email: string }[]).map((seller) => (
                 <div key={seller.id} className="flex items-center justify-between border-b pb-4">
                   <div>
                     <p className="font-semibold">{seller.name}</p>

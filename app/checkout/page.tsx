@@ -54,7 +54,8 @@ export default function CheckoutPage() {
           return sum + itemPrice * item.quantity
         }, 0)
 
-        await supabase.from('orders').insert({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from('orders').insert({
           user_id: user.id,
           seller_id,
           items: sellerItems,

@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Database } from '@/lib/supabase/database.types'
 
 export default function SignupPage() {
   const [name, setName] = useState('')
@@ -20,7 +21,7 @@ export default function SignupPage() {
   const supabase = createClient()
 
   const passwordStrength = useMemo(() => {
-    if (!password) return { strength: 0, label: '', color: '' }
+    if (!password) return { strength: 0, label: '', color: '', checks: {} }
     
     let strength = 0
     const checks = {
@@ -69,12 +70,12 @@ export default function SignupPage() {
 
     if (authData.user) {
       // Create user profile
-      const { error: profileError } = await supabase.from('users').insert({
+      const { error: profileError } = await (supabase as any).from('users').insert({
         id: authData.user.id,
         name,
         email,
         role,
-        verified: role === 'customer', // Auto-verify customers, sellers need approval
+        verified: role === 'customer',
       })
 
       if (profileError) {

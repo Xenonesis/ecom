@@ -61,7 +61,8 @@ export async function POST(request: Request) {
     )
   }
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
     .from('wishlist')
     .insert({ user_id: user.id, product_id })
     .select()

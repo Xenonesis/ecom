@@ -4,6 +4,7 @@ import { Package, ShoppingBag, DollarSign, TrendingUp } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Database } from '@/lib/supabase/database.types'
 
 export default async function SellerDashboard() {
   const supabase = await createServerClient()
@@ -14,26 +15,38 @@ export default async function SellerDashboard() {
     redirect('/login')
   }
 
-  const { data: userProfile } = await supabase
+  const { data } = await supabase
     .from('users')
     .select('*')
     .eq('id', user.id)
     .single()
 
-  if (!userProfile || userProfile.role !== 'seller') {
+  const userProfile: Database['public']['Tables']['users']['Row'] | null = data
+
+  if (!userProfile) {
+    redirect('/')
+  }
+
+  const typedUserProfile = userProfile as Database['public']['Tables']['users']['Row']
+
+  if (typedUserProfile.role !== 'seller') {
     redirect('/')
   }
 
   // Fetch seller stats
-  const { data: products } = await supabase
+  const { data: productData } = await supabase
     .from('products')
     .select('*')
     .eq('seller_id', user.id)
 
-  const { data: orders } = await supabase
+  const products: Database['public']['Tables']['products']['Row'][] = productData || []
+
+  const { data: orderData } = await supabase
     .from('orders')
     .select('*')
     .eq('seller_id', user.id)
+
+  const orders: Database['public']['Tables']['orders']['Row'][] = orderData || []
 
   const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
   const totalProducts = products?.length || 0
@@ -44,14 +57,14 @@ export default async function SellerDashboard() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Seller Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {userProfile.name}!</p>
+          <p className="text-muted-foreground">Welcome back, {typedUserProfile.name}!</p>
         </div>
         <Link href="/seller/products/new">
           <Button>Add New Product</Button>
         </Link>
       </div>
 
-      {!userProfile.verified && (
+      {!typedUserProfile.verified && (
         <div className="mb-6 rounded-lg bg-yellow-50 p-4 text-yellow-800">
           Your seller account is pending verification. You can add products, but they won&apos;t be visible to customers until approved.
         </div>

@@ -19,12 +19,13 @@ export async function POST(req: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!admin || admin.role !== 'admin') {
+    if (!admin || (admin as { role: string }).role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Approve seller
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('users')
       .update({ verified: true })
       .eq('id', sellerId)

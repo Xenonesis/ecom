@@ -61,14 +61,16 @@ export async function POST(request: Request) {
     .eq('id', user.id)
     .single()
 
-  if (!userData || !['seller', 'admin'].includes(userData.role)) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!userData || !['seller', 'admin'].includes((userData as any).role)) {
     return NextResponse.json(
       { error: 'Only sellers can create products' },
       { status: 403 }
     )
   }
 
-  if (userData.role === 'seller' && !userData.verified) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((userData as any).role === 'seller' && !(userData as any).verified) {
     return NextResponse.json(
       { error: 'Seller account not yet verified' },
       { status: 403 }
@@ -111,7 +113,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
   }
 
-  const { data: product, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: product, error } = await (supabase as any)
     .from('products')
     .update(updates)
     .eq('id', id)

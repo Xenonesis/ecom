@@ -55,11 +55,13 @@ export async function POST(request: Request) {
     .eq('id', items[0].product_id)
     .single()
 
-  const { data: order, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: order, error } = await (supabase as any)
     .from('orders')
     .insert({
       user_id: user.id,
-      seller_id: product?.seller_id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      seller_id: (product as any)?.seller_id,
       items,
       total_amount,
       shipping_address,
@@ -100,7 +102,8 @@ export async function PATCH(request: Request) {
     )
   }
 
-  const { data: order, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: order, error } = await (supabase as any)
     .from('orders')
     .update({ status })
     .eq('id', id)

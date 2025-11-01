@@ -47,7 +47,8 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const { name, phone, avatar_url } = body
 
-    const { data: profile, error: updateError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: profile, error: updateError } = await (supabase as any)
       .from('users')
       .update({
         name,

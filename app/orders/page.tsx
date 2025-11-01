@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatPrice, formatDate } from '@/lib/utils'
+import { Database } from '@/lib/supabase/database.types'
 
 export default async function OrdersPage() {
   const supabase = await createServerClient()
@@ -12,11 +13,13 @@ export default async function OrdersPage() {
     redirect('/login')
   }
 
-  const { data: orders } = await supabase
+  const { data } = await supabase
     .from('orders')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+
+  const orders: Database['public']['Tables']['orders']['Row'][] = data || []
 
   return (
     <div className="container mx-auto px-4 py-8">

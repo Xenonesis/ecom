@@ -25,16 +25,6 @@ export default function CategoriesPage() {
   
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  useEffect(() => {
-    if (selectedCategory) {
-      fetchCategoryProducts(selectedCategory)
-    }
-  }, [selectedCategory])
-
   const fetchCategories = async () => {
     setLoading(true)
     
@@ -46,7 +36,8 @@ export default function CategoriesPage() {
     if (allProducts) {
       const categoryMap = new Map<string, { count: number; image: string }>()
       
-      allProducts.forEach((product) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      allProducts.forEach((product: any) => {
         const existing = categoryMap.get(product.category) || { count: 0, image: '' }
         categoryMap.set(product.category, {
           count: existing.count + 1,
@@ -73,10 +64,22 @@ export default function CategoriesPage() {
       .select('*')
       .eq('category', category)
       .order('created_at', { ascending: false })
-    
+
     setProducts(data || [])
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchCategoryProducts(selectedCategory)
+    }
+  }, [selectedCategory])
 
   return (
     <div className="container mx-auto px-4 py-8">
