@@ -148,7 +148,7 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
         <div className="space-y-4">
           <div className="relative aspect-square overflow-hidden rounded-xl border-2">
             <Image
-              src={product.images[selectedImage] || '/placeholder.png'}
+              src={product.images[selectedImage] || '/placeholder.svg'}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"

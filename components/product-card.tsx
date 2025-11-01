@@ -40,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
       price: product.price,
       discount: product.discount,
       quantity: 1,
-      image: product.images[0] || '/placeholder.png',
+      image: product.images[0] || '/placeholder.svg',
       seller_id: product.seller_id,
     })
     
@@ -58,7 +58,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
-            src={product.images[0] || '/placeholder.png'}
+            src={product.images[0] || '/placeholder.svg'}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
