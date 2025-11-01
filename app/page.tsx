@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import { createServerClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/database.types'
+import DotGrid from '@/components/Prism'
 
 export default async function Home() {
   const supabase = await createServerClient()
@@ -20,9 +21,10 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-linear-to-br from-primary/5 via-purple-500/5 to-background py-20 lg:py-32">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="container relative mx-auto px-4">
+      <section className="relative overflow-hidden py-20 lg:py-32 min-h-[600px] lg:min-h-[800px]">
+        <DotGrid />
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container relative mx-auto px-4 z-10">
           <div className="mx-auto max-w-4xl text-center animate-fadeIn">
             <div className="mb-6 inline-block">
               <span className="rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
