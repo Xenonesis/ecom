@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { ArrowRight, ShoppingBag, Shield, Truck, Zap, Award, HeadphonesIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
+import { HeroCarousel } from '@/components/hero-carousel'
+import { CategoryIcons } from '@/components/category-icons'
 import { createServerClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/database.types'
-import DotGrid from '@/components/Prism'
 
 export default async function Home() {
   const supabase = await createServerClient()
@@ -18,61 +19,26 @@ export default async function Home() {
 
   const products: Database['public']['Tables']['products']['Row'][] = data || []
 
+  // Fetch active promotions for carousel
+  const { data: promotions } = await supabase
+    .from('promotions')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+    .limit(5)
+
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 lg:py-32 min-h-[600px] lg:min-h-[800px]">
-        <DotGrid />
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="container relative mx-auto px-4 z-10">
-          <div className="mx-auto max-w-4xl text-center animate-fadeIn">
-            <div className="mb-6 inline-block">
-              <span className="rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                🎉 Welcome to ShopHub
-              </span>
-            </div>
-            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Discover Amazing Products
-              <span className="bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent"> from Verified Sellers</span>
-            </h1>
-            <p className="mb-8 text-lg text-muted-foreground sm:text-xl">
-              Shop with confidence from our curated marketplace. Get the best deals, fast shipping, and exceptional customer service.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/products">
-                <Button size="lg" className="w-full sm:w-auto text-base px-8">
-                  Browse Products
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/seller">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base px-8">
-                  Become a Seller
-                </Button>
-              </Link>
-            </div>
-            
-            {/* Stats */}
-            <div className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">10K+</div>
-                <div className="mt-1 text-sm text-muted-foreground">Products</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">5K+</div>
-                <div className="mt-1 text-sm text-muted-foreground">Happy Customers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">500+</div>
-                <div className="mt-1 text-sm text-muted-foreground">Verified Sellers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">99%</div>
-                <div className="mt-1 text-sm text-muted-foreground">Satisfaction</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Hero Carousel Section */}
+      {promotions && promotions.length > 0 && (
+        <section className="container mx-auto px-4 py-8">
+          <HeroCarousel promotions={promotions} />
+        </section>
+      )}
+
+      {/* Category Icons */}
+      <section className="container mx-auto px-4 py-8">
+        <CategoryIcons />
       </section>
 
       {/* Features */}

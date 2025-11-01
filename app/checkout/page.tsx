@@ -5,15 +5,112 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { Tag, X } from 'lucide-react'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, getTotalPrice, clearCart } = useCartStore()
   const total = getTotalPrice()
   const supabase = createClient()
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [couponCode, setCouponCode] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+  const [couponError, setCouponError] = useState('')
+  const [applyingCoupon, setApplyingCoupon] = useState(false)
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return
+
+    setApplyingCoupon(true)
+    setCouponError('')
+
+    try {
+      const { data: coupon, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', couponCode.toUpperCase())
+        .eq('is_active', true)
+        .single()
+
+      if (error || !coupon) {
+        setCouponError('Invalid coupon code')
+        setApplyingCoupon(false)
+        return
+      }
+
+      // Check if coupon is still valid
+      const now = new Date()
+      const validFrom = new Date(coupon.valid_from)
+      const validUntil = coupon.valid_until ? new Date(coupon.valid_until) : null
+
+      if (now < validFrom || (validUntil && now > validUntil)) {
+        setCouponError('Coupon has expired')
+        setApplyingCoupon(false)
+        return
+      }
+
+      // Check minimum order amount
+      if (total < coupon.min_order_amount) {
+        setCouponError(`Minimum order amount is ${formatPrice(coupon.min_order_amount)}`)
+        setApplyingCoupon(false)
+        return
+      }
+
+      // Check usage limit
+      if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
+        setCouponError('Coupon usage limit reached')
+        setApplyingCoupon(false)
+        return
+      }
+
+      setAppliedCoupon(coupon)
+      setCouponCode('')
+    } catch (error) {
+      console.error('Error applying coupon:', error)
+      setCouponError('Failed to apply coupon')
+    } finally {
+      setApplyingCoupon(false)
+    }
+  }
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponError('')
+  }
+
+  const calculateDiscount = () => {
+    if (!appliedCoupon) return 0
+
+    let discount = 0
+    if (appliedCoupon.discount_type === 'percentage') {
+      discount = (total * appliedCoupon.discount_value) / 100
+      if (appliedCoupon.max_discount_amount) {
+        discount = Math.min(discount, appliedCoupon.max_discount_amount)
+      }
+    } else {
+      discount = appliedCoupon.discount_value
+    }
+
+    return Math.min(discount, total)
+  }
+
+  const discount = calculateDiscount()
+  const shippingFee = total > 500 ? 0 : 50
+  const finalTotal = total - discount + shippingFee
 
   const [formData, setFormData] = useState({
     name: '',
@@ -202,18 +299,76 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Coupon Code Section */}
+              <div className="border-t pt-4">
+                <div className="mb-3">
+                  <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Tag className="h-4 w-4" />
+                    Have a Coupon?
+                  </label>
+                  {!appliedCoupon ? (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter coupon code"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={applyCoupon}
+                        disabled={!couponCode.trim() || applyingCoupon}
+                      >
+                        {applyingCoupon ? 'Applying...' : 'Apply'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-green-600">
+                          {appliedCoupon.code}
+                        </Badge>
+                        <span className="text-sm text-green-700 dark:text-green-300">
+                          {appliedCoupon.discount_type === 'percentage'
+                            ? `${appliedCoupon.discount_value}% off`
+                            : `${formatPrice(appliedCoupon.discount_value)} off`}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={removeCoupon}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                  {couponError && (
+                    <p className="text-sm text-red-500 mt-2">{couponError}</p>
+                  )}
+                </div>
+              </div>
+
               <div className="border-t pt-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>{formatPrice(total)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                    <span>Discount ({appliedCoupon.code})</span>
+                    <span>-{formatPrice(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{total > 500 ? 'FREE' : formatPrice(50)}</span>
+                  <span>{shippingFee === 0 ? 'FREE' : formatPrice(shippingFee)}</span>
                 </div>
                 <div className="mt-2 flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span>{formatPrice(total + (total > 500 ? 0 : 50))}</span>
+                  <span>{formatPrice(finalTotal)}</span>
                 </div>
               </div>
             </CardContent>

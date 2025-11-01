@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, User, Search, Menu, X, LogOut, Package, Heart, Settings, Moon, Sun } from 'lucide-react'
+import { ShoppingCart, User, Menu, X, LogOut, Package, Heart, Settings, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { SearchAutocomplete } from '@/components/search-autocomplete'
+import { MegaMenu } from '@/components/mega-menu'
 import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
-import { Database } from '@/lib/supabase/database.types'
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -107,15 +107,13 @@ export function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              <Link href="/" className="text-2xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                 ShopHub
               </Link>
               <div className="hidden lg:flex items-center gap-6">
+                <MegaMenu />
                 <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
                   Products
-                </Link>
-                <Link href="/categories" className="text-sm font-medium hover:text-primary transition-colors">
-                  Categories
                 </Link>
                 <Link href="/deals" className="text-sm font-medium hover:text-primary transition-colors">
                   Deals
@@ -124,14 +122,7 @@ export function Navbar() {
             </div>
 
             <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  className="pl-10 bg-muted/50"
-                />
-              </div>
+              <SearchAutocomplete />
             </div>
 
             <div className="flex items-center gap-2">
@@ -229,14 +220,7 @@ export function Navbar() {
 
           {/* Mobile Search */}
           <div className="md:hidden pb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="pl-10 bg-muted/50"
-              />
-            </div>
+            <SearchAutocomplete />
           </div>
         </div>
       </nav>

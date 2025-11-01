@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Plus, Minus } from 'lucide-react'
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Plus, Minus, Upload, MessageSquare, ThumbsUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { ProductCard } from '@/components/product-card'
 import { useRouter } from 'next/navigation'
+import { Textarea } from '@/components/ui/textarea'
 
 interface Product {
   id: string
@@ -304,10 +305,11 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
         </div>
       </div>
 
-      {/* Tabs for Reviews and Related Products */}
+      {/* Tabs for Reviews, Q&A, and Related Products */}
       <Tabs defaultValue="reviews" className="mt-16">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-2xl grid-cols-3">
           <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+          <TabsTrigger value="qa">Q&A</TabsTrigger>
           <TabsTrigger value="related">Related Products</TabsTrigger>
         </TabsList>
 
@@ -339,12 +341,23 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
                 </div>
                 <div>
                   <Label>Comment</Label>
-                  <Input
+                  <Textarea
                     value={newReview.comment}
                     onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                     placeholder="Share your thoughts about this product..."
                     className="mt-2"
+                    rows={4}
                   />
+                </div>
+                <div>
+                  <Label>Add Photos (Optional)</Label>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button variant="outline" size="sm" type="button">
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Images
+                    </Button>
+                    <span className="text-xs text-muted-foreground">Max 5 images</span>
+                  </div>
                 </div>
                 <Button onClick={submitReview} disabled={!newReview.comment.trim()}>
                   Submit Review
@@ -391,6 +404,36 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
               No reviews yet. Be the first to review!
             </p>
           )}
+        </TabsContent>
+
+        <TabsContent value="qa" className="mt-6">
+          {/* Ask a Question */}
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Ask a Question
+              </h3>
+              <div className="space-y-4">
+                <Textarea
+                  placeholder="Ask a question about this product..."
+                  rows={3}
+                />
+                <Button>
+                  Submit Question
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Questions & Answers */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Product Questions</h3>
+            <div className="text-center py-8 text-muted-foreground">
+              <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>No questions yet. Be the first to ask!</p>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="related" className="mt-6">

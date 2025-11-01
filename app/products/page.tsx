@@ -1,41 +1,49 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Filter, Search, SlidersHorizontal } from 'lucide-react'
+import { Filter, Search, SlidersHorizontal, Grid3X3, List, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { ProductCard } from '@/components/product-card'
+import { PriceRangeSlider } from '@/components/price-range-slider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import Image from 'next/image'
+import Link from 'next/link'
+import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([])
+  const [allProducts, setAllProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('newest')
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [priceRange, setPriceRange] = useState<string | null>(null)
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000])
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+  const [selectedRating, setSelectedRating] = useState<number | null>(null)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 12
   
   const supabase = createClient()
 
   useEffect(() => {
-    fetchProducts()
-  }, [sortBy, selectedCategory, priceRange])
+    fetchAllProducts()
+  }, [sortBy, selectedCategory])
 
-  const fetchProducts = async () => {
+  const fetchAllProducts = async () => {
     setLoading(true)
     let query = supabase.from('products').select('*')
 
     if (selectedCategory) {
       query = query.eq('category', selectedCategory)
-    }
-
-    if (priceRange) {
-      const [min, max] = priceRange.split('-').map(Number)
-      query = query.gte('price', min)
-      if (max) query = query.lte('price', max)
     }
 
     switch (sortBy) {
@@ -53,21 +61,42 @@ export default function ProductsPage() {
     }
 
     const { data } = await query
-    setProducts(data || [])
+    setAllProducts(data || [])
+    setProducts((data || []).slice(0, ITEMS_PER_PAGE))
+    setPage(1)
+    setHasMore((data || []).length > ITEMS_PER_PAGE)
     setLoading(false)
   }
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const loadMore = () => {
+    const nextPage = page + 1
+    const startIndex = page * ITEMS_PER_PAGE
+    const endIndex = startIndex + ITEMS_PER_PAGE
+    const newProducts = filteredProducts.slice(startIndex, endIndex)
+    
+    setProducts([...products, ...newProducts])
+    setPage(nextPage)
+    setHasMore(endIndex < filteredProducts.length)
+  }
 
-  const categories = ['Electronics', 'Fashion', 'Home', 'Sports', 'Books']
-  const priceRanges = [
-    { label: 'Under ₹500', value: '0-500' },
-    { label: '₹500 - ₹1000', value: '500-1000' },
-    { label: '₹1000 - ₹2500', value: '1000-2500' },
-    { label: 'Above ₹2500', value: '2500-999999' },
-  ]
+  const filteredProducts = allProducts.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1]
+    const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.category) // Using category as brand placeholder
+    const matchesRating = selectedRating === null || product.rating >= selectedRating
+    
+    return matchesSearch && matchesPrice && matchesBrand && matchesRating
+  })
+
+  const categories = ['Electronics', 'Fashion', 'Home', 'Sports', 'Books', 'Watches', 'Laptops', 'Audio']
+  const brands = Array.from(new Set(allProducts.map(p => p.category)))
+  const ratings = [4, 3, 2, 1]
+
+  const handleBrandToggle = (brand: string) => {
+    setSelectedBrands(prev =>
+      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -93,6 +122,25 @@ export default function ProductsPage() {
         </div>
         
         <div className="flex gap-2">
+          <div className="flex gap-1 border rounded-md">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="icon"
+              onClick={() => setViewMode('grid')}
+              className="rounded-r-none"
+            >
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="icon"
+              onClick={() => setViewMode('list')}
+              className="rounded-l-none"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
@@ -118,7 +166,7 @@ export default function ProductsPage() {
       {/* Filters Panel */}
       {showFilters && (
         <div className="mb-8 rounded-lg border bg-muted/30 p-6 animate-fadeIn">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Category Filter */}
             <div>
               <h3 className="mb-3 font-semibold flex items-center gap-2">
@@ -149,46 +197,83 @@ export default function ProductsPage() {
             {/* Price Range Filter */}
             <div>
               <h3 className="mb-3 font-semibold">Price Range</h3>
-              <div className="flex flex-wrap gap-2">
-                <Badge
-                  variant={priceRange === null ? 'default' : 'outline'}
-                  className="cursor-pointer"
-                  onClick={() => setPriceRange(null)}
-                >
-                  All
-                </Badge>
-                {priceRanges.map((range) => (
-                  <Badge
-                    key={range.value}
-                    variant={priceRange === range.value ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => setPriceRange(range.value)}
-                  >
-                    {range.label}
-                  </Badge>
+              <PriceRangeSlider
+                min={0}
+                max={10000}
+                value={priceRange}
+                onChange={(value) => setPriceRange(value as [number, number])}
+              />
+            </div>
+
+            {/* Brand Filter */}
+            <div>
+              <h3 className="mb-3 font-semibold">Brand</h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {brands.map((brand) => (
+                  <div key={brand} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`brand-${brand}`}
+                      checked={selectedBrands.includes(brand)}
+                      onCheckedChange={() => handleBrandToggle(brand)}
+                    />
+                    <Label
+                      htmlFor={`brand-${brand}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {brand}
+                    </Label>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Active Filters */}
+            {/* Rating Filter */}
             <div>
-              <h3 className="mb-3 font-semibold">Active Filters</h3>
-              {(selectedCategory || priceRange) ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedCategory(null)
-                    setPriceRange(null)
-                  }}
+              <h3 className="mb-3 font-semibold">Minimum Rating</h3>
+              <div className="space-y-2">
+                <Badge
+                  variant={selectedRating === null ? 'default' : 'outline'}
+                  className="cursor-pointer mb-2"
+                  onClick={() => setSelectedRating(null)}
                 >
-                  Clear All
-                </Button>
-              ) : (
-                <p className="text-sm text-muted-foreground">No filters applied</p>
-              )}
+                  All Ratings
+                </Badge>
+                {ratings.map((rating) => (
+                  <div
+                    key={rating}
+                    className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-muted ${
+                      selectedRating === rating ? 'bg-muted' : ''
+                    }`}
+                    onClick={() => setSelectedRating(rating)}
+                  >
+                    <div className="flex">
+                      {[...new Array(rating)].map((_, i) => (
+                        <Star key={`star-${rating}-${i}`} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <span className="text-sm">& Up</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Clear Filters */}
+          {(selectedCategory || selectedBrands.length > 0 || selectedRating !== null || priceRange[0] !== 0 || priceRange[1] !== 10000) && (
+            <div className="mt-4 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelectedCategory(null)
+                  setSelectedBrands([])
+                  setSelectedRating(null)
+                  setPriceRange([0, 10000])
+                }}
+              >
+                Clear All Filters
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -199,11 +284,11 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Grid/List with Infinite Scroll */}
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="space-y-4">
+          {[...new Array(8)].map((_, i) => (
+            <div key={`skeleton-${i}`} className="space-y-4">
               <Skeleton className="aspect-square w-full" />
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
@@ -211,11 +296,96 @@ export default function ProductsPage() {
           ))}
         </div>
       ) : filteredProducts.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <InfiniteScroll
+          dataLength={products.length}
+          next={loadMore}
+          hasMore={hasMore}
+          loader={
+            <div className="col-span-full flex justify-center py-8">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                <span className="text-sm text-muted-foreground">Loading more...</span>
+              </div>
+            </div>
+          }
+          endMessage={
+            <div className="col-span-full text-center py-8">
+              <p className="text-sm text-muted-foreground">You&apos;ve seen all products</p>
+            </div>
+          }
+        >
+          {viewMode === 'grid' ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {products.map((product) => {
+                const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
+                return (
+                  <div
+                    key={product.id}
+                    className="flex gap-4 p-4 border rounded-lg hover:shadow-lg transition-shadow"
+                  >
+                    <Link href={`/product/${product.id}`} className="relative w-48 h-48 shrink-0 bg-muted rounded-lg overflow-hidden">
+                      <Image
+                        src={product.images[0] || '/placeholder.svg'}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </Link>
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <Link href={`/product/${product.id}`}>
+                          <h3 className="text-lg font-semibold hover:text-primary transition-colors mb-2">
+                            {product.name}
+                          </h3>
+                        </Link>
+                        <div className="flex items-center gap-1 mb-2">
+                          <div className="flex">
+                            {[...new Array(5)].map((_, i) => (
+                              <Star
+                                key={`list-star-${product.id}-${i}`}
+                                className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            ({product.rating.toFixed(1)})
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="mb-2">
+                          {product.category}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-bold text-primary">{formatPrice(discountedPrice)}</span>
+                          {product.discount > 0 && (
+                            <>
+                              <span className="text-sm text-muted-foreground line-through">
+                                {formatPrice(product.price)}
+                              </span>
+                              <Badge className="bg-red-500">
+                                {product.discount}% OFF
+                              </Badge>
+                            </>
+                          )}
+                        </div>
+                        <Link href={`/product/${product.id}`}>
+                          <Button>View Details</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </InfiniteScroll>
       ) : (
         <div className="rounded-lg border border-dashed py-20 text-center">
           <p className="text-muted-foreground">
@@ -227,7 +397,9 @@ export default function ProductsPage() {
             onClick={() => {
               setSearchTerm('')
               setSelectedCategory(null)
-              setPriceRange(null)
+              setPriceRange([0, 10000])
+              setSelectedBrands([])
+              setSelectedRating(null)
             }}
           >
             Clear Filters

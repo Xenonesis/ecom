@@ -1,36 +1,54 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ProductCard } from '@/components/product-card'
+import { CountdownTimer } from '@/components/countdown-timer'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { Percent, TrendingDown, Zap } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { Percent, TrendingDown, Zap, Flame } from 'lucide-react'
+
+interface Product {
+  id: string
+  name: string
+  price: number
+  discount: number
+  image_url: string
+  description: string
+  images?: string[]
+  rating?: number
+  seller_id?: string
+  stock?: number
+}
 
 export default function DealsPage() {
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'high' | 'medium'>('all')
   
-  const supabase = createClient()
+  // Calculate flash sale end time once (24 hours from now)
+  const flashSaleEnd = useMemo(() => new Date(Date.now() + 24 * 60 * 60 * 1000), [])
+  
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
-    fetchDeals()
-  }, [])
-
-  const fetchDeals = async () => {
-    setLoading(true)
+    const fetchDealsData = async () => {
+      setLoading(true)
+      
+      // Fetch products with discounts
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .gt('discount', 0)
+        .order('discount', { ascending: false })
+      
+      setProducts(data || [])
+      setLoading(false)
+    }
     
-    // Fetch products with discounts
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .gt('discount', 0)
-      .order('discount', { ascending: false })
-    
-    setProducts(data || [])
-    setLoading(false)
-  }
+    fetchDealsData()
+  }, [supabase])
 
   const filteredProducts = products.filter(product => {
     if (filter === 'high') return product.discount >= 30
@@ -47,14 +65,54 @@ export default function DealsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Flash Sale Section with Countdown */}
+      <Card className="mb-8 overflow-hidden border-2 border-red-500">
+        <div className="bg-linear-to-r from-red-500 to-orange-500 p-6 text-white">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <div className="flex items-center gap-3">
+              <Flame className="h-10 w-10 animate-pulse" />
+              <div>
+                <h2 className="text-2xl font-bold">Flash Sale</h2>
+                <p className="text-sm opacity-90">Deals ending soon - Don&apos;t miss out!</p>
+              </div>
+            </div>
+            <div className="shrink-0">
+              <CountdownTimer endDate={flashSaleEnd} />
+            </div>
+          </div>
+        </div>
+        
+        {/* Top Flash Sale Products */}
+        {!loading && products.length > 0 && (
+          <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+            {products
+              .filter(p => p.discount >= 30)
+              .slice(0, 4)
+              .map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={{
+                    ...product,
+                    images: product.images || [product.image_url],
+                    rating: product.rating || 0,
+                    seller_id: product.seller_id || '',
+                    stock: product.stock || 0
+                  }} 
+                />
+              ))
+            }
+          </div>
+        )}
+      </Card>
+
       {/* Hero Section */}
-      <div className="mb-8 rounded-lg bg-gradient-to-r from-primary to-purple-600 p-8 text-white">
+      <div className="mb-8 rounded-lg bg-linear-to-r from-primary to-purple-600 p-8 text-white">
         <div className="flex items-center gap-3 mb-4">
           <Zap className="h-10 w-10" />
           <h1 className="text-3xl font-bold sm:text-4xl">Hot Deals & Discounts</h1>
         </div>
         <p className="text-lg opacity-90 max-w-2xl">
-          Save big on your favorite products! Limited time offers you don't want to miss.
+          Save big on your favorite products! Limited time offers you don&apos;t want to miss.
         </p>
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div className="rounded-lg bg-white/10 p-4 backdrop-blur">
@@ -132,8 +190,8 @@ export default function DealsPage() {
       {/* Products Grid */}
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="space-y-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="space-y-4">
               <Skeleton className="aspect-square w-full" />
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
@@ -143,7 +201,16 @@ export default function DealsPage() {
       ) : filteredProducts.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              key={product.id} 
+              product={{
+                ...product,
+                images: product.images || [product.image_url],
+                rating: product.rating || 0,
+                seller_id: product.seller_id || '',
+                stock: product.stock || 0
+              }} 
+            />
           ))}
         </div>
       ) : (
