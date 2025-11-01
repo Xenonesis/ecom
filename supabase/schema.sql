@@ -43,7 +43,10 @@ CREATE TABLE orders (
     status order_status DEFAULT 'pending',
     payment_status payment_status DEFAULT 'unpaid',
     shipping_address JSONB NOT NULL,
+    payment_method TEXT DEFAULT 'card' CHECK (payment_method IN ('card', 'upi', 'emi', 'pay_later')),
     payment_intent_id TEXT,
+    upi_id TEXT,
+    emi_months INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

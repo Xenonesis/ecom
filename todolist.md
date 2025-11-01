@@ -4,28 +4,28 @@ This todo list outlines features and improvements inspired by Flipkart (https://
 
 ## High Priority
 
-- [ ] **Implement Dynamic Hero Banners and Promotional Sliders**: Add carousel with deals and category icons to `app/page.tsx`. Fetch data from new Supabase `promotions` table.
-- [ ] **Enhance Search with Autocomplete and Suggestions**: Update `components/navbar.tsx` and `app/api/search/route.ts` for autocomplete using Supabase full-text search. Add voice search for mobile.
-- [ ] **Add Advanced Filters and Sorting**: Implement sidebar filters (price, brand, ratings) in `app/products/page.tsx` using `ui/select.tsx` and `ui/checkbox.tsx`. Update URL params and Supabase queries.
-- [ ] **Improve Product Listings with Infinite Scroll**: Add infinite scroll to `app/products/page.tsx` using `react-infinite-scroll-component` for better performance.
+- [x] **Implement Dynamic Hero Banners and Promotional Sliders**: Add carousel with deals and category icons to `app/page.tsx`. Fetch data from new Supabase `promotions` table.
+- [x] **Enhance Search with Autocomplete and Suggestions**: Update `components/navbar.tsx` and `app/api/search/route.ts` for autocomplete using Supabase full-text search. Add voice search for mobile.
+- [x] **Add Advanced Filters and Sorting**: Implement sidebar filters (price, brand, ratings) in `app/products/page.tsx` using `ui/select.tsx` and `ui/checkbox.tsx`. Update URL params and Supabase queries.
+- [x] **Improve Product Listings with Infinite Scroll**: Add infinite scroll to `app/products/page.tsx` using `react-infinite-scroll-component` for better performance.
 - [ ] **Expand User Profile Management**: Enhance `app/profile/page.tsx` with order history and wishlist integration. Add tabs using `ui/tabs.tsx`.
-- [ ] **Integrate Social Login Options**: Update `app/login/page.tsx` and `app/signup/page.tsx` with Supabase Auth social providers.
-- [ ] **Enhance Cart with Persistence and Recommendations**: Use `store/cart.ts` for session persistence. Add "Frequently Bought Together" in `app/cart/page.tsx`.
-- [ ] **Add Multiple Payment Options**: Integrate EMI, UPI, and Pay Later in `app/checkout/page.tsx` using payment gateways like Stripe.
-- [ ] **Implement Product Reviews and Ratings**: Add reviews section to `app/product/[id]/page.tsx` with photos and Q&A. Store in Supabase `reviews` table.
-- [ ] **Add Coupon Integration**: Validate coupons at checkout from new Supabase `coupons` table.
-- [ ] **Create Mega Menu Dropdowns**: Enhance `components/navbar.tsx` with hierarchical category dropdowns using `ui/dropdown-menu.tsx`.
-- [ ] **Ensure Mobile-First Responsiveness**: Optimize all components for touch and mobile breakpoints using Tailwind CSS.
+- [x] **Integrate Social Login Options**: Update `app/login/page.tsx` and `app/signup/page.tsx` with Supabase Auth social providers.
+- [x] **Enhance Cart with Persistence and Recommendations**: Use `store/cart.ts` for session persistence. Add "Frequently Bought Together" in `app/cart/page.tsx`.
+- [x] **Add Multiple Payment Options**: Integrate EMI, UPI, and Pay Later in `app/checkout/page.tsx` using payment gateways like Stripe.
+- [x] **Implement Product Reviews and Ratings**: Add reviews section to `app/product/[id]/page.tsx` with photos and Q&A. Store in Supabase `reviews` table.
+- [x] **Add Coupon Integration**: Validate coupons at checkout from new Supabase `coupons` table.
+- [x] **Create Mega Menu Dropdowns**: Enhance `components/navbar.tsx` with hierarchical category dropdowns using `ui/dropdown-menu.tsx`.
+- [x] **Ensure Mobile-First Responsiveness**: Optimize all components for touch and mobile breakpoints using Tailwind CSS.
 
 ## Medium Priority
 
 - [ ] **Add Personalized Recommendations**: Implement "Recommended for You" in `app/page.tsx` based on user orders from Supabase.
-- [ ] **Implement Grid/List View Toggle**: Add toggle in `app/products/page.tsx` for `product-card.tsx` layouts.
-- [ ] **Add Price Range Slider**: Include interactive slider in product filters using a library like `rc-slider`.
+- [x] **Implement Grid/List View Toggle**: Add toggle in `app/products/page.tsx` for `product-card.tsx` layouts.
+- [x] **Add Price Range Slider**: Include interactive slider in product filters using a library like `rc-slider`.
 - [ ] **Enable Guest Checkout**: Modify `app/checkout/page.tsx` to allow purchases without login.
 - [ ] **Build Seller Dashboard**: Create `app/seller/page.tsx` with product management and analytics using Supabase.
 - [ ] **Add Review Moderation**: Implement admin approval in `app/api/reviews/route.ts`.
-- [ ] **Implement Flash Sales with Timers**: Add countdown timers to `app/deals/page.tsx` for time-limited deals.
+- [x] **Implement Flash Sales with Timers**: Add countdown timers to `app/deals/page.tsx` for time-limited deals.
 - [ ] **Add Breadcrumb Navigation**: Include breadcrumbs in `app/product/[id]/page.tsx` and category pages.
 - [ ] **Introduce Loyalty Program**: Add points system to Supabase users table and redeem in checkout.
 

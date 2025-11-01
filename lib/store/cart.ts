@@ -13,18 +13,24 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[]
+  isLoading: boolean
+  recommendations: CartItem[]
   addItem: (item: CartItem) => void
   removeItem: (product_id: string) => void
   updateQuantity: (product_id: string, quantity: number) => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
+  syncWithDatabase: (userId: string) => Promise<void>
+  loadRecommendations: (productIds: string[]) => Promise<void>
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      isLoading: false,
+      recommendations: [],
       addItem: (item) =>
         set((state) => {
           const existingItem = state.items.find((i) => i.product_id === item.product_id)
@@ -61,9 +67,58 @@ export const useCartStore = create<CartStore>()(
           return sum + discountedPrice * item.quantity
         }, 0)
       },
+      syncWithDatabase: async (userId: string) => {
+        set({ isLoading: true })
+        try {
+          // Load cart from database
+          const response = await fetch('/api/cart')
+          if (response.ok) {
+            const { items: dbItems } = await response.json()
+            const cartItems: CartItem[] = dbItems.map((item: any) => ({
+              product_id: item.product_id,
+              name: item.product.name,
+              price: item.product.price,
+              discount: item.product.discount,
+              quantity: item.quantity,
+              image: item.product.images[0] || '',
+              seller_id: item.product.seller_id,
+            }))
+            set({ items: cartItems })
+          }
+        } catch (error) {
+          console.error('Failed to sync cart with database:', error)
+        } finally {
+          set({ isLoading: false })
+        }
+      },
+      loadRecommendations: async (productIds: string[]) => {
+        if (productIds.length === 0) return
+
+        try {
+          // Get frequently bought together products
+          const response = await fetch(`/api/products?recommendations=${productIds.join(',')}&limit=4`)
+          if (response.ok) {
+            const { products } = await response.json()
+            const recommendations: CartItem[] = products.map((product: any) => ({
+              product_id: product.id,
+              name: product.name,
+              price: product.price,
+              discount: product.discount,
+              quantity: 1,
+              image: product.images[0] || '',
+              seller_id: product.seller_id,
+            }))
+            set({ recommendations })
+          }
+        } catch (error) {
+          console.error('Failed to load recommendations:', error)
+        }
+      },
     }),
     {
       name: 'cart-storage',
+      // Only persist items, not loading state or recommendations
+      partialize: (state) => ({ items: state.items }),
     }
   )
 )

@@ -1,15 +1,113 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
-import { Tag, X } from 'lucide-react'
+import { Tag, X, CreditCard, Smartphone, Calendar, Clock } from 'lucide-react'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+interface PaymentFormProps {
+  readonly amount: number
+  readonly onPaymentSuccess: (paymentIntentId: string) => void
+  readonly onPaymentError: (error: string) => void
+}
+
+interface Coupon {
+  id: string
+  code: string
+  discount_type: 'percentage' | 'fixed'
+  discount_value: number
+  min_order_amount: number
+  max_discount_amount?: number
+  usage_limit?: number
+  usage_count: number
+  valid_from: string
+  valid_until?: string
+}
+
+function PaymentForm({ amount, onPaymentSuccess, onPaymentError }: PaymentFormProps) {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+
+    if (!stripe || !elements) {
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const { data: { clientSecret } } = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      }).then(res => res.json())
+
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) {
+        onPaymentError('Card element not found')
+        return
+      }
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+        },
+      })
+
+      if (error) {
+        onPaymentError(error.message || 'Payment failed')
+      } else if (paymentIntent?.status === 'succeeded') {
+        onPaymentSuccess(paymentIntent.id)
+      }
+    } catch (err) {
+      console.error('Payment error:', err)
+      onPaymentError('Payment failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <label htmlFor="card-element" className="text-sm font-medium">Card Information</label>
+        <div id="card-element" className="p-3 border rounded-md">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  '::placeholder': {
+                    color: '#aab7c4',
+                  },
+                },
+              },
+            }}
+          />
+        </div>
+      </div>
+      <Button type="submit" className="w-full" disabled={!stripe || loading}>
+        {loading ? 'Processing...' : `Pay ${formatPrice(amount)}`}
+      </Button>
+    </form>
+  )
+}
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -28,9 +126,13 @@ export default function CheckoutPage() {
   })
   const [loading, setLoading] = useState(false)
   const [couponCode, setCouponCode] = useState('')
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null)
   const [couponError, setCouponError] = useState('')
   const [applyingCoupon, setApplyingCoupon] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState('card')
+  const [emiMonths, setEmiMonths] = useState('3')
+  const [upiId, setUpiId] = useState('')
+  const [paymentError, setPaymentError] = useState('')
 
   const applyCoupon = async () => {
     if (!couponCode.trim()) return
@@ -52,10 +154,24 @@ export default function CheckoutPage() {
         return
       }
 
+      // Type assertion for coupon
+      const typedCoupon = coupon as {
+        id: string
+        code: string
+        discount_type: 'percentage' | 'fixed'
+        discount_value: number
+        min_order_amount: number
+        max_discount_amount?: number
+        usage_limit?: number
+        usage_count: number
+        valid_from: string
+        valid_until?: string
+      }
+
       // Check if coupon is still valid
       const now = new Date()
-      const validFrom = new Date(coupon.valid_from)
-      const validUntil = coupon.valid_until ? new Date(coupon.valid_until) : null
+      const validFrom = new Date(typedCoupon.valid_from)
+      const validUntil = typedCoupon.valid_until ? new Date(typedCoupon.valid_until) : null
 
       if (now < validFrom || (validUntil && now > validUntil)) {
         setCouponError('Coupon has expired')
@@ -64,20 +180,20 @@ export default function CheckoutPage() {
       }
 
       // Check minimum order amount
-      if (total < coupon.min_order_amount) {
-        setCouponError(`Minimum order amount is ${formatPrice(coupon.min_order_amount)}`)
+      if (total < typedCoupon.min_order_amount) {
+        setCouponError(`Minimum order amount is ${formatPrice(typedCoupon.min_order_amount)}`)
         setApplyingCoupon(false)
         return
       }
 
       // Check usage limit
-      if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
+      if (typedCoupon.usage_limit && typedCoupon.usage_count >= typedCoupon.usage_limit) {
         setCouponError('Coupon usage limit reached')
         setApplyingCoupon(false)
         return
       }
 
-      setAppliedCoupon(coupon)
+      setAppliedCoupon(typedCoupon)
       setCouponCode('')
     } catch (error) {
       console.error('Error applying coupon:', error)
@@ -112,20 +228,18 @@ export default function CheckoutPage() {
   const shippingFee = total > 500 ? 0 : 50
   const finalTotal = total - discount + shippingFee
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
-  })
-  const [loading, setLoading] = useState(false)
+  const calculateEMI = (months: number) => {
+    const principal = finalTotal
+    const annualInterest = 0.12 // 12% annual interest
+    const monthlyInterest = annualInterest / 12
+    const emi = (principal * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
+                (Math.pow(1 + monthlyInterest, months) - 1)
+    return Math.round(emi)
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
     setLoading(true)
+    setPaymentError('')
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -159,7 +273,79 @@ export default function CheckoutPage() {
           total_amount: orderTotal,
           shipping_address: formData,
           status: 'pending',
-          payment_status: 'unpaid',
+          payment_status: 'paid',
+          payment_method: paymentMethod,
+          payment_intent_id: paymentIntentId,
+          ...(paymentMethod === 'emi' && { emi_months: Number.parseInt(emiMonths) }),
+        })
+      }
+
+      clearCart()
+      router.push('/orders')
+    } catch (error) {
+      console.error('Order creation error:', error)
+      setPaymentError('Failed to create order')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePaymentError = (error: string) => {
+    setPaymentError(error)
+    setLoading(false)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setPaymentError('')
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      if (paymentMethod === 'card') {
+        // Payment will be handled by Stripe Elements
+        return
+      }
+
+      if (paymentMethod === 'upi' && !upiId.trim()) {
+        setPaymentError('Please enter UPI ID')
+        setLoading(false)
+        return
+      }
+
+      // For UPI, EMI, and Pay Later - create order with pending payment
+      const ordersBySeller = items.reduce((acc, item) => {
+        if (!acc[item.seller_id]) {
+          acc[item.seller_id] = []
+        }
+        acc[item.seller_id].push(item)
+        return acc
+      }, {} as Record<string, typeof items>)
+
+      for (const [seller_id, sellerItems] of Object.entries(ordersBySeller)) {
+        const orderTotal = sellerItems.reduce((sum, item) => {
+          const itemPrice = item.price - (item.price * item.discount) / 100
+          return sum + itemPrice * item.quantity
+        }, 0)
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from('orders').insert({
+          user_id: user.id,
+          seller_id,
+          items: sellerItems,
+          total_amount: orderTotal,
+          shipping_address: formData,
+          status: 'pending',
+          payment_status: paymentMethod === 'pay_later' ? 'pending' : 'unpaid',
+          payment_method: paymentMethod,
+          ...(paymentMethod === 'upi' && { upi_id: upiId }),
+          ...(paymentMethod === 'emi' && { emi_months: Number.parseInt(emiMonths) }),
         })
       }
 
@@ -167,6 +353,7 @@ export default function CheckoutPage() {
       router.push('/orders')
     } catch (error) {
       console.error('Checkout error:', error)
+      setPaymentError('Failed to place order')
     } finally {
       setLoading(false)
     }
@@ -211,16 +398,18 @@ export default function CheckoutPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <label className="text-sm font-medium">Full Name</label>
+                    <label htmlFor="full-name" className="text-sm font-medium">Full Name</label>
                     <Input
+                      id="full-name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Email</label>
+                    <label htmlFor="email" className="text-sm font-medium">Email</label>
                     <Input
+                      id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -230,8 +419,9 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Phone</label>
+                  <label htmlFor="phone" className="text-sm font-medium">Phone</label>
                   <Input
+                    id="phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -240,8 +430,9 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Address</label>
+                  <label htmlFor="address" className="text-sm font-medium">Address</label>
                   <Input
+                    id="address"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     required
@@ -250,24 +441,27 @@ export default function CheckoutPage() {
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <div>
-                    <label className="text-sm font-medium">City</label>
+                    <label htmlFor="city" className="text-sm font-medium">City</label>
                     <Input
+                      id="city"
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">State</label>
+                    <label htmlFor="state" className="text-sm font-medium">State</label>
                     <Input
+                      id="state"
                       value={formData.state}
                       onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Pincode</label>
+                    <label htmlFor="pincode" className="text-sm font-medium">Pincode</label>
                     <Input
+                      id="pincode"
                       value={formData.pincode}
                       onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                       required
@@ -279,6 +473,145 @@ export default function CheckoutPage() {
                   {loading ? 'Processing...' : 'Place Order'}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* Payment Method Selection */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Method</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={paymentMethod} onValueChange={setPaymentMethod} className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="card" className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    <span className="hidden sm:inline">Card</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="upi" className="flex items-center gap-2">
+                    <Smartphone className="h-4 w-4" />
+                    <span className="hidden sm:inline">UPI</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="emi" className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span className="hidden sm:inline">EMI</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="pay_later" className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span className="hidden sm:inline">Pay Later</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="card" className="mt-4">
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Pay securely with your credit or debit card
+                    </p>
+                    <Elements stripe={stripePromise}>
+                      <PaymentForm
+                        amount={finalTotal}
+                        onPaymentSuccess={handlePaymentSuccess}
+                        onPaymentError={handlePaymentError}
+                      />
+                    </Elements>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="upi" className="mt-4">
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Pay using UPI ID or scan QR code
+                    </p>
+                    <div className="space-y-2">
+                      <label htmlFor="upi-id" className="text-sm font-medium">UPI ID</label>
+                      <Input
+                        id="upi-id"
+                        placeholder="yourname@upi"
+                        value={upiId}
+                        onChange={(e) => setUpiId(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      onClick={handleSubmit}
+                      className="w-full"
+                      disabled={loading || !upiId.trim()}
+                    >
+                      {loading ? 'Processing...' : `Pay ${formatPrice(finalTotal)} with UPI`}
+                    </Button>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="emi" className="mt-4">
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Split your payment into easy monthly installments
+                    </p>
+                    <div className="space-y-2">
+                      <label htmlFor="emi-tenure" className="text-sm font-medium">EMI Tenure</label>
+                      <Select value={emiMonths} onValueChange={setEmiMonths}>
+                        <SelectTrigger id="emi-tenure">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="3">3 Months - {formatPrice(calculateEMI(3))}/month</SelectItem>
+                          <SelectItem value="6">6 Months - {formatPrice(calculateEMI(6))}/month</SelectItem>
+                          <SelectItem value="9">9 Months - {formatPrice(calculateEMI(9))}/month</SelectItem>
+                          <SelectItem value="12">12 Months - {formatPrice(calculateEMI(12))}/month</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="p-3 bg-muted rounded-md">
+                      <div className="flex justify-between text-sm">
+                        <span>Total Amount:</span>
+                        <span>{formatPrice(finalTotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Monthly EMI:</span>
+                        <span>{formatPrice(calculateEMI(Number.parseInt(emiMonths)))}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-medium">
+                        <span>Total with Interest:</span>
+                        <span>{formatPrice(calculateEMI(Number.parseInt(emiMonths)) * Number.parseInt(emiMonths))}</span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleSubmit}
+                      className="w-full"
+                      disabled={loading}
+                    >
+                      {loading ? 'Processing...' : `Start EMI - ${formatPrice(calculateEMI(Number.parseInt(emiMonths)))}/month`}
+                    </Button>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="pay_later" className="mt-4">
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Pay after delivery. No payment required now.
+                    </p>
+                    <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md">
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        ✓ Pay after receiving your order<br />
+                        ✓ 7 days payment window<br />
+                        ✓ No interest or fees
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleSubmit}
+                      className="w-full"
+                      disabled={loading}
+                    >
+                      {loading ? 'Processing...' : 'Place Order - Pay Later'}
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              {paymentError && (
+                <div className="mt-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md">
+                  <p className="text-sm text-red-700 dark:text-red-300">{paymentError}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

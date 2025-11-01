@@ -2,17 +2,26 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react'
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
+import { useEffect } from 'react'
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, getTotalPrice, clearCart } = useCartStore()
+  const { items, recommendations, removeItem, updateQuantity, getTotalPrice, clearCart, loadRecommendations } = useCartStore()
   const total = getTotalPrice()
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+
+  // Load recommendations based on current cart items
+  useEffect(() => {
+    if (items.length > 0) {
+      const productIds = items.map(item => item.product_id)
+      loadRecommendations(productIds)
+    }
+  }, [items, loadRecommendations])
 
   if (items.length === 0) {
     return (
@@ -38,7 +47,7 @@ export default function CartPage() {
           {itemCount} {itemCount === 1 ? 'item' : 'items'} in your cart
         </p>
       </div>
-      
+
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           {items.map((item) => {
@@ -110,6 +119,53 @@ export default function CartPage() {
               </Card>
             )
           })}
+
+          {/* Frequently Bought Together Section */}
+          {recommendations.length > 0 && (
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Frequently Bought Together
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Customers who bought these items also bought these
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {recommendations.map((item) => {
+                    const itemPrice = calculateDiscountedPrice(item.price, item.discount)
+                    return (
+                      <div key={item.product_id} className="group">
+                        <Link href={`/product/${item.product_id}`} className="block">
+                          <div className="relative aspect-square overflow-hidden rounded-lg bg-muted mb-3">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              className="object-cover transition-transform group-hover:scale-105"
+                            />
+                            {item.discount > 0 && (
+                              <Badge variant="destructive" className="absolute top-2 left-2 text-xs">
+                                {item.discount}% OFF
+                              </Badge>
+                            )}
+                          </div>
+                          <h4 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                            {item.name}
+                          </h4>
+                          <p className="text-sm font-semibold text-primary mt-1">
+                            {formatPrice(itemPrice)}
+                          </p>
+                        </Link>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <div className="lg:col-span-1">

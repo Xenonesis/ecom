@@ -12,6 +12,42 @@ export async function GET(request: Request) {
   const maxPrice = searchParams.get('max_price')
   const sort = searchParams.get('sort') || 'created_at'
   const order = searchParams.get('order') || 'desc'
+  const recommendations = searchParams.get('recommendations')
+  const limit = searchParams.get('limit')
+
+  // Handle recommendations request
+  if (recommendations) {
+    const productIds = recommendations.split(',')
+    const limitNum = limit ? parseInt(limit) : 4
+
+    // Get categories of the products in cart
+    const { data: cartProducts } = await supabase
+      .from('products')
+      .select('category')
+      .in('id', productIds)
+
+    if (cartProducts && cartProducts.length > 0) {
+      const categories = [...new Set(cartProducts.map((p: any) => p.category))]
+
+      // Get recommended products from same categories, excluding cart items
+      const { data: recommendedProducts, error } = await supabase
+        .from('products')
+        .select('*')
+        .in('category', categories)
+        .not('id', 'in', `(${productIds.join(',')})`)
+        .order('rating', { ascending: false })
+        .limit(limitNum * 2) // Get more to filter out low-rated ones
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+
+      // Filter and limit results
+      const filtered = (recommendedProducts as any)?.filter((p: any) => p.rating >= 4.0).slice(0, limitNum) || []
+
+      return NextResponse.json({ products: filtered })
+    }
+  }
 
   let query = supabase.from('products').select('*')
 
@@ -29,6 +65,10 @@ export async function GET(request: Request) {
 
   if (maxPrice) {
     query = query.lte('price', parseFloat(maxPrice))
+  }
+
+  if (limit) {
+    query = query.limit(parseInt(limit))
   }
 
   query = query.order(sort, { ascending: order === 'asc' })
