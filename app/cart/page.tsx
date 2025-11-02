@@ -11,10 +11,11 @@ import { Breadcrumbs } from '@/components/breadcrumbs'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { useNotification } from '@/components/toast-notifications'
 
 export default function CartPage() {
   const { items, recommendations, removeItem, updateQuantity, getTotalPrice, clearCart, loadRecommendations } = useCartStore()
+  const notify = useNotification()
   const [couponCode, setCouponCode] = useState('')
   const [discount, setDiscount] = useState(0)
   const [couponApplied, setCouponApplied] = useState(false)
@@ -40,8 +41,9 @@ export default function CartPage() {
     if (validCoupons[couponCode.toUpperCase()]) {
       setDiscount(validCoupons[couponCode.toUpperCase()])
       setCouponApplied(true)
+      notify.success('Coupon applied successfully!')
     } else {
-      toast.error('Invalid coupon code')
+      notify.error('Invalid coupon code')
     }
   }
 

@@ -10,8 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { ProductCard } from '@/components/product-card'
+import { ProductReviews } from '@/components/product-reviews'
+import { SizeGuide } from '@/components/size-guide'
+import { addToRecentlyViewed } from '@/components/recently-viewed'
 import { useRouter } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
+import { useCartStore } from '@/lib/store/cart'
+import { useNotification } from '@/components/toast-notifications'
 
 interface Product {
   id: string
@@ -49,55 +54,73 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
   const router = useRouter()
+  const addItem = useCartStore((state) => state.addItem)
+  const notify = useNotification()
+
+  // Add to recently viewed on mount
+  useState(() => {
+    addToRecentlyViewed({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      discount: product.discount,
+      images: product.images,
+      rating: product.rating,
+      seller_id: product.seller_id,
+      stock: product.stock,
+      category: product.category,
+    })
+  })
 
   const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100
   const totalPrice = discountedPrice * quantity
 
   const addToCart = async () => {
     try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_id: product.id,
-          quantity,
-        }),
+      addItem({
+        product_id: product.id,
+        name: product.name,
+        price: product.price,
+        discount: product.discount || 0,
+        quantity,
+        image: product.images?.[0] || '/placeholder.svg',
+        seller_id: product.seller_id || '',
       })
-
-      if (response.ok) {
-        alert('Added to cart!')
-        router.refresh()
-      } else if (response.status === 401) {
-        router.push('/login?redirect=/product/' + product.id)
-      }
+      notify.success(`${quantity} item(s) added to cart!`)
     } catch (error) {
       console.error('Error adding to cart:', error)
+      notify.error('Failed to add to cart')
     }
   }
 
   const toggleWishlist = async () => {
     try {
-      if (isInWishlist) {
-        const response = await fetch(`/api/wishlist?product_id=${product.id}`, {
-          method: 'DELETE',
+      setIsInWishlist(!isInWishlist)
+      if (!isInWishlist) {
+        // Add to wishlist in localStorage
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]')
+        wishlist.push({
+          id: Date.now().toString(),
+          product_id: product.id,
+          name: product.name,
+          price: product.price,
+          discount: product.discount || 0,
+          image: product.images?.[0] || '/placeholder.svg',
+          stock: product.stock,
+          category: product.category,
         })
-        if (response.ok) {
-          setIsInWishlist(false)
-        }
+        localStorage.setItem('wishlist', JSON.stringify(wishlist))
+        notify.success('Added to wishlist!')
       } else {
-        const response = await fetch('/api/wishlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product_id: product.id }),
-        })
-        if (response.ok) {
-          setIsInWishlist(true)
-        } else if (response.status === 401) {
-          router.push('/login?redirect=/product/' + product.id)
-        }
+        // Remove from wishlist
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]')
+        const updated = wishlist.filter((item: any) => item.product_id !== product.id)
+        localStorage.setItem('wishlist', JSON.stringify(updated))
+        notify.info('Removed from wishlist')
       }
     } catch (error) {
       console.error('Error toggling wishlist:', error)
+      notify.error('Failed to update wishlist')
     }
   }
 
@@ -241,6 +264,15 @@ export function ProductDetailClient({ product, reviews, relatedProducts }: Props
               </Badge>
             </div>
           </div>
+
+          {/* Size Guide */}
+          {(product.category.toLowerCase().includes('fashion') || 
+            product.category.toLowerCase().includes('clothing') || 
+            product.category.toLowerCase().includes('shoes')) && (
+            <div>
+              <SizeGuide />
+            </div>
+          )}
 
           {/* Quantity Selector */}
           <div className="flex items-center gap-4">

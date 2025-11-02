@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { LiveChat } from "@/components/live-chat";
 import { Toaster } from "@/components/ui/toast";
 import Link from "next/link";
 import { Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
@@ -37,6 +38,7 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <ScrollToTop />
+          <LiveChat />
           <Toaster />
           
           {/* Enhanced Footer */}

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import { CategoryIcons } from '@/components/category-icons'
 import { HeroCarousel } from '@/components/hero-carousel'
+import { NewsletterSignup } from '@/components/newsletter-signup'
+import { ProductRecommendations } from '@/components/product-recommendations'
 import { createServerClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/database.types'
 

@@ -6,7 +6,7 @@ import { ShoppingCart, User, Menu, X, LogOut, Package, Heart, Settings, Moon, Su
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
-import { SearchAutocomplete } from '@/components/search-autocomplete'
+import { AdvancedSearch } from '@/components/advanced-search'
 import { Notifications } from '@/components/notifications'
 import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
@@ -134,7 +134,7 @@ export function Navbar() {
             </div>
 
             <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <SearchAutocomplete />
+              <AdvancedSearch />
             </div>
 
             <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export function Navbar() {
 
           {/* Mobile Search */}
           <div className="md:hidden pb-4">
-            <SearchAutocomplete />
+            <AdvancedSearch />
           </div>
         </div>
       </nav>
