@@ -1,8 +1,14 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { rateLimit } from '@/lib/middleware/rate-limit'
+
+const limiter = rateLimit({ windowMs: 60000, max: 30 })
 
 // GET /api/wishlist - Get user's wishlist
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {
@@ -30,6 +36,9 @@ export async function GET() {
 
 // POST /api/wishlist - Add product to wishlist
 export async function POST(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {
@@ -77,6 +86,9 @@ export async function POST(request: Request) {
 
 // DELETE /api/wishlist?id=xxx - Remove product from wishlist
 export async function DELETE(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {

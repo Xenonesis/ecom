@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react'
 import { 
   BarChart3, 
   TrendingUp, 
-  DollarSign, 
   ShoppingCart, 
-  Users,
   Package,
   Calendar
 } from 'lucide-react'

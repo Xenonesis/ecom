@@ -1,8 +1,14 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { rateLimit } from '@/lib/middleware/rate-limit'
+
+const limiter = rateLimit({ windowMs: 60000, max: 20 })
 
 // GET /api/reviews?product_id=xxx - Get reviews for a product
 export async function GET(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
   const { searchParams } = new URL(request.url)
   const productId = searchParams.get('product_id')
@@ -32,6 +38,9 @@ export async function GET(request: Request) {
 
 // POST /api/reviews - Create a review
 export async function POST(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {
@@ -85,6 +94,9 @@ export async function POST(request: Request) {
 
 // PATCH /api/reviews - Update a review
 export async function PATCH(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {
@@ -119,6 +131,9 @@ export async function PATCH(request: Request) {
 
 // DELETE /api/reviews?id=xxx - Delete a review
 export async function DELETE(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {

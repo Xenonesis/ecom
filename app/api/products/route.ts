@@ -1,8 +1,14 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { rateLimit } from '@/lib/middleware/rate-limit'
+
+const limiter = rateLimit({ windowMs: 60000, max: 50 })
 
 // GET /api/products - Get all products with optional filters
 export async function GET(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
   const { searchParams } = new URL(request.url)
 
@@ -84,6 +90,9 @@ export async function GET(request: Request) {
 
 // POST /api/products - Create a new product (sellers only)
 export async function POST(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {
@@ -137,6 +146,9 @@ export async function POST(request: Request) {
 
 // PATCH /api/products - Update a product
 export async function PATCH(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {
@@ -171,6 +183,9 @@ export async function PATCH(request: Request) {
 
 // DELETE /api/products?id=xxx - Delete a product
 export async function DELETE(request: Request) {
+  const rateLimitResponse = await limiter(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   const supabase = await createServerClient()
 
   const {

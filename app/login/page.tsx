@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ShoppingBag, Mail, Lock, AlertCircle, Eye, EyeOff, CheckCircle2 } from 'lucide-react'
@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Database } from '@/lib/supabase/database.types'
 
 export default function LoginPage() {
   const [email, setEmail] = useState(() => {
