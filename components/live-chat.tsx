@@ -28,7 +28,7 @@ export function LiveChat() {
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const notify = useNotification()
+  // const notify = useNotification() // Currently unused, ready for future notifications
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

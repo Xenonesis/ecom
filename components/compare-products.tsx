@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { X, Plus, Star, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// Removed unused imports: Card, CardContent, CardHeader, CardTitle
 import { Badge } from '@/components/ui/badge'
 import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -185,16 +185,15 @@ function renderFeatureValue(key: string, product: Product) {
 
 // Hook to manage comparison
 export function useCompareProducts() {
-  const [compareProducts, setCompareProducts] = useState<Product[]>([])
-  const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => {
-    // Load from localStorage
-    const saved = localStorage.getItem('compareProducts')
-    if (saved) {
-      setCompareProducts(JSON.parse(saved))
+  const [compareProducts, setCompareProducts] = useState<Product[]>(() => {
+    // Initialize state from localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('compareProducts')
+      return saved ? JSON.parse(saved) : []
     }
-  }, [])
+    return []
+  })
+  const [isOpen, setIsOpen] = useState(false)
 
   const addToCompare = (product: Product) => {
     setCompareProducts((prev) => {

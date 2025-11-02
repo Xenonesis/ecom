@@ -27,7 +27,10 @@ function ResetPasswordForm() {
     const refreshToken = searchParams.get('refresh_token')
 
     if (!accessToken || !refreshToken) {
-      setError('Invalid reset link. Please request a new password reset.')
+      // Use setTimeout to avoid setState during render
+      setTimeout(() => {
+        setError('Invalid reset link. Please request a new password reset.')
+      }, 0)
       return
     }
 
@@ -37,7 +40,9 @@ function ResetPasswordForm() {
       refresh_token: refreshToken,
     }).catch((error) => {
       console.error('Error setting session:', error)
-      setError('Invalid reset link. Please request a new password reset.')
+      setTimeout(() => {
+        setError('Invalid reset link. Please request a new password reset.')
+      }, 0)
     })
   }, [searchParams, supabase.auth])
 

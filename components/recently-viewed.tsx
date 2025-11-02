@@ -17,15 +17,14 @@ interface Product {
 }
 
 export function RecentlyViewed() {
-  const [products, setProducts] = useState<Product[]>([])
-
-  useEffect(() => {
-    // Load recently viewed products from localStorage
-    const viewed = localStorage.getItem('recentlyViewed')
-    if (viewed) {
-      setProducts(JSON.parse(viewed))
+  const [products, setProducts] = useState<Product[]>(() => {
+    // Initialize state from localStorage
+    if (typeof window !== 'undefined') {
+      const viewed = localStorage.getItem('recentlyViewed')
+      return viewed ? JSON.parse(viewed) : []
     }
-  }, [])
+    return []
+  })
 
   if (products.length === 0) return null
 

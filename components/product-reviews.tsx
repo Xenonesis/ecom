@@ -29,7 +29,8 @@ interface ProductReviewsProps {
   reviews: Review[]
 }
 
-export function ProductReviews({ productId, averageRating, totalReviews, reviews }: ProductReviewsProps) {
+export function ProductReviews({ averageRating, totalReviews, reviews }: ProductReviewsProps) {
+  // productId is available in props for future API calls
   const [showWriteReview, setShowWriteReview] = useState(false)
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)

@@ -30,7 +30,11 @@ export default function DealsPage() {
   const [filter, setFilter] = useState<'all' | 'high' | 'medium'>('all')
   
   // Calculate flash sale end time once (24 hours from now)
-  const flashSaleEnd = useMemo(() => new Date(Date.now() + 24 * 60 * 60 * 1000), [])
+  const flashSaleEnd = useMemo(() => {
+    const endTime = new Date()
+    endTime.setHours(endTime.getHours() + 24)
+    return endTime
+  }, [])
   
   const supabase = useMemo(() => createClient(), [])
 

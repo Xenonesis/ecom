@@ -11,7 +11,17 @@ import { useRouter } from 'next/navigation'
 interface WishlistItem {
   id: string
   product_id: string
-  product: any
+  product: {
+    id: string
+    name: string
+    price: number
+    discount: number | null
+    images: string[] | null
+    rating: number | null
+    seller_id: string | null
+    stock: number
+    category: string
+  }
 }
 
 export default function WishlistPage() {
@@ -71,7 +81,7 @@ export default function WishlistPage() {
     }
   }
 
-  const addToCart = async (product: any) => {
+  const addToCart = async (product: WishlistItem['product']) => {
     try {
       const response = await fetch('/api/cart', {
         method: 'POST',

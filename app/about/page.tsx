@@ -81,7 +81,7 @@ export default function AboutPage() {
               thousands of sellers to reach a wider audience and grow their businesses.
             </p>
             <p>
-              We're more than just a marketplace – we're a community. A community built on trust, 
+              We&apos;re more than just a marketplace – we&apos;re a community. A community built on trust, 
               quality, and exceptional service. Every day, we work to make shopping online easier, 
               safer, and more enjoyable for everyone.
             </p>
@@ -135,7 +135,7 @@ export default function AboutPage() {
       <div className="text-center">
         <h2 className="text-3xl font-bold mb-4">Join Our Growing Community</h2>
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Whether you're looking to shop for the best deals or start selling your products, 
+          Whether you&apos;re looking to shop for the best deals or start selling your products, 
           ShopHub is the perfect platform for you.
         </p>
         <div className="flex gap-4 justify-center flex-wrap">

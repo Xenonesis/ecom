@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Filter, Search, SlidersHorizontal, Grid3X3, List, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { ProductCard } from '@/components/product-card'
@@ -35,11 +35,7 @@ export default function ProductsPage() {
   
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchAllProducts()
-  }, [sortBy, selectedCategory])
-
-  const fetchAllProducts = async () => {
+  const fetchAllProducts = useCallback(async () => {
     setLoading(true)
     let query = supabase.from('products').select('*')
 
@@ -67,7 +63,13 @@ export default function ProductsPage() {
     setPage(1)
     setHasMore((data || []).length > ITEMS_PER_PAGE)
     setLoading(false)
-  }
+  }, [sortBy, selectedCategory, supabase])
+
+  useEffect(() => {
+    // Fetch products on mount and when dependencies change
+    void fetchAllProducts()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortBy, selectedCategory])
 
   const loadMore = () => {
     const nextPage = page + 1

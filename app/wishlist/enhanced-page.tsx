@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Heart, Share2, ShoppingCart, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -25,21 +25,17 @@ interface WishlistItem {
 }
 
 export default function EnhancedWishlistPage() {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([])
+  const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
+    // Initialize state from localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('wishlist')
+      return saved ? JSON.parse(saved) : []
+    }
+    return []
+  })
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const addItem = useCartStore((state) => state.addItem)
   const notify = useNotification()
-
-  useEffect(() => {
-    loadWishlist()
-  }, [])
-
-  const loadWishlist = () => {
-    const saved = localStorage.getItem('wishlist')
-    if (saved) {
-      setWishlist(JSON.parse(saved))
-    }
-  }
 
   const removeFromWishlist = (productId: string) => {
     const updated = wishlist.filter(item => item.product_id !== productId)
