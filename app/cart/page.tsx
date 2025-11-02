@@ -11,6 +11,7 @@ import { Breadcrumbs } from '@/components/breadcrumbs'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function CartPage() {
   const { items, recommendations, removeItem, updateQuantity, getTotalPrice, clearCart, loadRecommendations } = useCartStore()
@@ -40,7 +41,7 @@ export default function CartPage() {
       setDiscount(validCoupons[couponCode.toUpperCase()])
       setCouponApplied(true)
     } else {
-      alert('Invalid coupon code')
+      toast.error('Invalid coupon code')
     }
   }
 

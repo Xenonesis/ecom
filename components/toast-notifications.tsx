@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import { CheckCircle2, XCircle, AlertCircle, Info } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 

@@ -199,7 +199,7 @@ export function useCompareProducts() {
   const addToCompare = (product: Product) => {
     setCompareProducts((prev) => {
       if (prev.length >= 4) {
-        alert('You can only compare up to 4 products')
+        notify.warning('You can only compare up to 4 products')
         return prev
       }
       if (prev.some((p) => p.id === product.id)) {

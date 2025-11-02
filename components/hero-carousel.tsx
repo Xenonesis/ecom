@@ -78,6 +78,14 @@ export function HeroCarousel({ promotions = [] }: HeroCarouselProps) {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
   }
 
+  if (slides.length === 0) {
+    return (
+      <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-muted flex items-center justify-center">
+        <span className="text-muted-foreground text-lg">No promotions available.</span>
+      </div>
+    )
+  }
+
   return (
     <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-muted">
       {/* Slides */}
