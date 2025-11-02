@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, ShoppingCart, Heart, Eye } from 'lucide-react'
+import { Star, ShoppingCart, Heart, Eye, GitCompare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { useCartStore } from '@/lib/store/cart'
+import { useNotification } from '@/components/toast-notifications'
 
 interface Product {
   id: string
@@ -30,6 +31,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [adding, setAdding] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
+  const notify = useNotification()
   const discountedPrice = calculateDiscountedPrice(product.price, product.discount || 0)
 
   const handleAddToCart = async () => {
@@ -46,7 +48,18 @@ export function ProductCard({ product }: ProductCardProps) {
     
     // Simulate a brief loading state for better UX
     await new Promise(resolve => setTimeout(resolve, 300))
+    notify.success('Product added to cart!')
     setAdding(false)
+  }
+
+  const handleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsWishlisted(!isWishlisted)
+    if (!isWishlisted) {
+      notify.success('Added to wishlist!')
+    } else {
+      notify.info('Removed from wishlist')
+    }
   }
 
   return (
@@ -82,21 +95,29 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button
               variant="secondary"
               size="icon"
-              className="h-9 w-9 rounded-full shadow-lg"
-              onClick={(e) => {
-                e.preventDefault()
-                setIsWishlisted(!isWishlisted)
-              }}
+              className="h-9 w-9 rounded-full shadow-lg hover:scale-110 transition-transform"
+              onClick={handleWishlist}
+              title="Add to wishlist"
             >
-              <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+              <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
             </Button>
             <Button
               variant="secondary"
               size="icon"
-              className="h-9 w-9 rounded-full shadow-lg"
+              className="h-9 w-9 rounded-full shadow-lg hover:scale-110 transition-transform"
               onClick={(e) => e.preventDefault()}
+              title="Quick view"
             >
               <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-9 w-9 rounded-full shadow-lg hover:scale-110 transition-transform"
+              onClick={(e) => e.preventDefault()}
+              title="Compare"
+            >
+              <GitCompare className="h-4 w-4" />
             </Button>
           </div>
         </div>

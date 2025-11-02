@@ -18,36 +18,70 @@ interface Promotion {
 }
 
 interface HeroCarouselProps {
-  readonly promotions: Promotion[]
+  readonly promotions?: Promotion[]
 }
 
-export function HeroCarousel({ promotions }: HeroCarouselProps) {
+export function HeroCarousel({ promotions = [] }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
 
+  // Default slides if no promotions provided
+  const defaultSlides: Promotion[] = [
+    {
+      id: 'default-1',
+      title: 'Welcome to ShopHub',
+      description: 'Discover amazing deals on quality products from verified sellers',
+      image_url: '/placeholder.svg',
+      link_url: '/products',
+      category: null,
+      is_active: true,
+      display_order: 1,
+    },
+    {
+      id: 'default-2',
+      title: 'Flash Sale Today',
+      description: 'Up to 50% off on selected items - Limited time offer',
+      image_url: '/placeholder.svg',
+      link_url: '/deals',
+      category: null,
+      is_active: true,
+      display_order: 2,
+    },
+    {
+      id: 'default-3',
+      title: 'New Arrivals',
+      description: 'Check out our latest collection of trending products',
+      image_url: '/placeholder.svg',
+      link_url: '/products',
+      category: null,
+      is_active: true,
+      display_order: 3,
+    },
+  ]
+
+  const slides = promotions.length > 0 ? promotions : defaultSlides
+
   useEffect(() => {
-    if (promotions.length === 0) return
+    if (slides.length === 0) return
 
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % promotions.length)
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
     }, 5000) // Auto-advance every 5 seconds
 
     return () => clearInterval(timer)
-  }, [promotions.length])
+  }, [slides.length])
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % promotions.length)
+    setCurrentSlide((prev) => (prev + 1) % slides.length)
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + promotions.length) % promotions.length)
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
   }
-
-  if (promotions.length === 0) return null
 
   return (
     <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-muted">
       {/* Slides */}
-      {promotions.map((promo, index) => (
+      {slides.map((promo, index) => (
         <div
           key={promo.id}
           className={`absolute inset-0 transition-opacity duration-500 ${
@@ -93,7 +127,7 @@ export function HeroCarousel({ promotions }: HeroCarouselProps) {
       ))}
 
       {/* Navigation Buttons */}
-      {promotions.length > 1 && (
+      {slides.length > 1 && (
         <>
           <Button
             variant="secondary"
@@ -114,7 +148,7 @@ export function HeroCarousel({ promotions }: HeroCarouselProps) {
 
           {/* Dots Indicator */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {promotions.map((promo, index) => (
+            {slides.map((promo, index) => (
               <button
                 key={`slide-${promo.id}-${index}`}
                 onClick={() => setCurrentSlide(index)}

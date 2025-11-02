@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { Toaster } from "@/components/ui/toast";
 import Link from "next/link";
 import { Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,8 @@ export default function RootLayout({
         >
           <Navbar />
           <main className="min-h-screen">{children}</main>
+          <ScrollToTop />
+          <Toaster />
           
           {/* Enhanced Footer */}
           <footer className="border-t bg-muted/30">

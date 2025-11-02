@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { ArrowRight, ShoppingBag, Shield, Truck, Zap, Award, HeadphonesIcon } from 'lucide-react'
+import { ArrowRight, ShoppingBag, Shield, Truck, Zap, Award, HeadphonesIcon, Sparkles, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import { CategoryIcons } from '@/components/category-icons'
+import { HeroCarousel } from '@/components/hero-carousel'
 import { createServerClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/database.types'
 
@@ -28,11 +29,50 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-
+      {/* Hero Carousel */}
+      <section className="container mx-auto px-4 pt-8">
+        <HeroCarousel />
+      </section>
 
       {/* Category Icons */}
       <section className="container mx-auto px-4 py-8">
         <CategoryIcons />
+      </section>
+
+      {/* Special Offers Banner */}
+      <section className="container mx-auto px-4 pb-8">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
+            <Sparkles className="absolute -right-4 -top-4 h-24 w-24 opacity-20" />
+            <div className="relative">
+              <h3 className="text-2xl font-bold mb-2">Flash Sale</h3>
+              <p className="text-sm opacity-90 mb-4">Up to 50% off on selected items</p>
+              <Link href="/deals">
+                <Button variant="secondary" size="sm">Shop Now</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white">
+            <TrendingUp className="absolute -right-4 -top-4 h-24 w-24 opacity-20" />
+            <div className="relative">
+              <h3 className="text-2xl font-bold mb-2">New Arrivals</h3>
+              <p className="text-sm opacity-90 mb-4">Discover the latest products</p>
+              <Link href="/products">
+                <Button variant="secondary" size="sm">Explore</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-green-500 to-green-600 p-6 text-white sm:col-span-2 lg:col-span-1">
+            <Award className="absolute -right-4 -top-4 h-24 w-24 opacity-20" />
+            <div className="relative">
+              <h3 className="text-2xl font-bold mb-2">Best Sellers</h3>
+              <p className="text-sm opacity-90 mb-4">Most popular products this month</p>
+              <Link href="/products?sort=popular">
+                <Button variant="secondary" size="sm">View All</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Features */}

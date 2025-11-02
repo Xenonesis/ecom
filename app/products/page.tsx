@@ -5,10 +5,11 @@ import { Filter, Search, SlidersHorizontal, Grid3X3, List, Star } from 'lucide-r
 import { createClient } from '@/lib/supabase/client'
 import { ProductCard } from '@/components/product-card'
 import { PriceRangeSlider } from '@/components/price-range-slider'
+import { Breadcrumbs } from '@/components/breadcrumbs'
+import { ProductGridSkeleton } from '@/components/skeleton-loader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -100,6 +101,8 @@ export default function ProductsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumbs className="mb-6" />
+      
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold sm:text-4xl">All Products</h1>
@@ -286,15 +289,7 @@ export default function ProductsPage() {
 
       {/* Products Grid/List with Infinite Scroll */}
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[...new Array(8)].map((_, i) => (
-            <div key={`skeleton-${i}`} className="space-y-4">
-              <Skeleton className="aspect-square w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          ))}
-        </div>
+        <ProductGridSkeleton count={8} />
       ) : filteredProducts.length > 0 ? (
         <InfiniteScroll
           dataLength={products.length}
