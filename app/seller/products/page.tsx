@@ -27,9 +27,17 @@ export default async function SellerProductsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">My Products</h1>
-        <Link href="/seller/products/new">
-          <Button>Add New Product</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/seller/products/analytics">
+            <Button variant="outline">Analytics</Button>
+          </Link>
+          <Link href="/seller/products/templates">
+            <Button variant="outline">Templates</Button>
+          </Link>
+          <Link href="/seller/products/new">
+            <Button>Add New Product</Button>
+          </Link>
+        </div>
       </div>
 
       {products && products.length > 0 ? (

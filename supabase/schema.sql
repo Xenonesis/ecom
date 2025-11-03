@@ -31,6 +31,7 @@ CREATE TABLE products (
     stock INTEGER NOT NULL DEFAULT 0,
     images TEXT[] DEFAULT '{}',
     rating NUMERIC(3, 2) DEFAULT 0,
+    visibility TEXT DEFAULT 'public' CHECK (visibility IN ('public', 'private', 'draft')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -228,7 +229,11 @@ CREATE POLICY "Admins can view all users" ON users FOR SELECT USING (
 CREATE POLICY "Anyone can insert user on signup" ON users FOR INSERT WITH CHECK (true);
 
 -- Products policies
-CREATE POLICY "Anyone can view products" ON products FOR SELECT USING (true);
+CREATE POLICY "Anyone can view public products" ON products FOR SELECT USING (
+    visibility = 'public' 
+    OR auth.uid() = seller_id 
+    OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
 CREATE POLICY "Sellers can insert own products" ON products FOR INSERT WITH CHECK (
     auth.uid() = seller_id AND 
     EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('seller', 'admin'))

@@ -39,6 +39,7 @@ export default function EditProductPage() {
     price: '',
     discount: '0',
     stock: '',
+    visibility: 'public',
   })
   const [images, setImages] = useState<string[]>([])
 
@@ -60,6 +61,7 @@ export default function EditProductPage() {
           price: product.price.toString(),
           discount: (product.discount || 0).toString(),
           stock: product.stock.toString(),
+          visibility: product.visibility || 'public',
         })
         setImages(product.images || [])
       } catch (err) {
@@ -87,6 +89,7 @@ export default function EditProductPage() {
         discount: parseFloat(formData.discount),
         stock: parseInt(formData.stock),
         images: images,
+        visibility: formData.visibility,
       }
 
       const response = await fetch('/api/products', {
@@ -244,6 +247,25 @@ export default function EditProductPage() {
             </div>
 
             <ImageUpload images={images} onChange={setImages} />
+
+            <div className="space-y-2">
+              <Label htmlFor="visibility">Visibility *</Label>
+              <select
+                id="visibility"
+                name="visibility"
+                value={formData.visibility}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                required
+              >
+                <option value="public">Public - Visible to all users</option>
+                <option value="private">Private - Only visible to you</option>
+                <option value="draft">Draft - Work in progress</option>
+              </select>
+              <p className="text-xs text-muted-foreground">
+                Choose who can see this product
+              </p>
+            </div>
 
             <div className="flex gap-4">
               <Button type="submit" disabled={loading} className="flex-1">

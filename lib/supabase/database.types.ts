@@ -174,6 +174,7 @@ export type Database = {
           seller_id: string | null
           stock: number
           updated_at: string | null
+          visibility: string | null
         }
         Insert: {
           category: string
@@ -188,6 +189,7 @@ export type Database = {
           seller_id?: string | null
           stock?: number
           updated_at?: string | null
+          visibility?: string | null
         }
         Update: {
           category?: string
@@ -202,6 +204,7 @@ export type Database = {
           seller_id?: string | null
           stock?: number
           updated_at?: string | null
+          visibility?: string | null
         }
         Relationships: [
           {

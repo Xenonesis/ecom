@@ -19,6 +19,7 @@ import {
 import BulkActions from './components/bulk-actions'
 import ProductFilters, { FilterState } from './components/product-filters'
 import ProductStats from './components/product-stats'
+import ProductActions from './components/product-actions'
 
 type Product = Database['public']['Tables']['products']['Row']
 
@@ -193,7 +194,19 @@ export default function SellerProductsClient({ products }: SellerProductsClientP
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg truncate">{product.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg truncate">{product.name}</h3>
+                    {product.visibility === 'private' && (
+                      <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                        Private
+                      </span>
+                    )}
+                    {product.visibility === 'draft' && (
+                      <span className="text-xs bg-yellow-200 text-yellow-700 px-2 py-1 rounded">
+                        Draft
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground mt-1">{product.category}</p>
                   <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                     {product.description}
@@ -210,6 +223,7 @@ export default function SellerProductsClient({ products }: SellerProductsClientP
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0">
+                  <ProductActions product={product} />
                   <Link href={`/seller/products/${product.id}/edit`}>
                     <Button variant="outline" size="icon" title="Edit product">
                       <Edit className="h-4 w-4" />

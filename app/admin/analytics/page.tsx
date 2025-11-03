@@ -9,7 +9,8 @@ import {
   Calendar
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Breadcrumbs } from '@/components/breadcrumbs'
+
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/client'
 
 export default function AnalyticsPage() {
@@ -85,7 +86,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Breadcrumbs className="mb-6" />
+      {/* <Breadcrumbs className="mb-6" /> */}
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2">
