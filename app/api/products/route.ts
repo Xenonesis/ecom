@@ -4,13 +4,33 @@ import { rateLimit } from '@/lib/middleware/rate-limit'
 
 const limiter = rateLimit({ windowMs: 60000, max: 50 })
 
-// GET /api/products - Get all products with optional filters
+// GET /api/products - Get all products with optional filters or a single product by ID
 export async function GET(request: Request) {
   const rateLimitResponse = await limiter(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const supabase = await createServerClient()
   const { searchParams } = new URL(request.url)
+
+  // Handle single product fetch by ID
+  const id = searchParams.get('id')
+  if (id) {
+    const { data: product, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    }
+
+    return NextResponse.json({ product })
+  }
 
   const category = searchParams.get('category')
   const search = searchParams.get('search')

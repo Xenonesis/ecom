@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingBag, Mail, Lock, AlertCircle, Check, X, User, UserCircle, Store } from 'lucide-react'
+import { ShoppingBag, Mail, Lock, AlertCircle, Check, X, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,6 @@ export default function SignupPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState<'customer' | 'seller'>('customer')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -117,8 +116,8 @@ export default function SignupPage() {
         id: authData.user.id,
         name,
         email,
-        role,
-        verified: role === 'customer',
+        role: 'customer', // All users start as customers
+        verified: true, // Auto-verify all new users
       })
 
       if (profileError) {
@@ -146,7 +145,7 @@ export default function SignupPage() {
         <Card className="border-2 shadow-xl">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold">Create an Account</CardTitle>
-            <CardDescription>Sign up to start your shopping journey</CardDescription>
+            <CardDescription>Sign up to start shopping or become a seller</CardDescription>
           </CardHeader>
           <form onSubmit={handleSignup}>
             <CardContent className="space-y-4">
@@ -254,45 +253,10 @@ export default function SignupPage() {
                   </div>
                 )}
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Account Type</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setRole('customer')}
-                    className={`flex items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                      role === 'customer' 
-                        ? 'border-primary bg-primary/5 text-primary' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <UserCircle className="h-5 w-5" />
-                    <div className="text-left">
-                      <div className="font-semibold">Customer</div>
-                      <div className="text-xs text-muted-foreground">Shop products</div>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('seller')}
-                    className={`flex items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                      role === 'seller' 
-                        ? 'border-primary bg-primary/5 text-primary' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <Store className="h-5 w-5" />
-                    <div className="text-left">
-                      <div className="font-semibold">Seller</div>
-                      <div className="text-xs text-muted-foreground">Sell products</div>
-                    </div>
-                  </button>
-                </div>
-                {role === 'seller' && (
-                  <p className="text-xs text-muted-foreground animate-fadeIn">
-                    Note: Seller accounts require admin approval before you can list products.
-                  </p>
-                )}
+              <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 p-3">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  <strong>Note:</strong> You can upgrade to a seller account later from your profile settings to start selling products.
+                </p>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">

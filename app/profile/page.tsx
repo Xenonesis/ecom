@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, Mail, Phone, Shield, Calendar, Save, Loader2, AlertCircle, CheckCircle2, Package, Heart, ShoppingBag, Eye, Trash2, Star, Palette } from 'lucide-react'
+import { User, Mail, Phone, Shield, Calendar, Save, Loader2, AlertCircle, CheckCircle2, Package, Heart, ShoppingBag, Eye, Trash2, Star, Palette, Store } from 'lucide-react'
 import { useAuthStore } from '@/lib/store/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -57,6 +57,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [switchingRole, setSwitchingRole] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -96,14 +97,14 @@ export default function ProfilePage() {
         const ordersResponse = await fetch('/api/orders')
         if (ordersResponse.ok) {
           const ordersData = await ordersResponse.json()
-          setOrders(ordersData)
+          setOrders(Array.isArray(ordersData) ? ordersData : ordersData.orders || [])
         }
 
         // Fetch wishlist
         const wishlistResponse = await fetch('/api/wishlist')
         if (wishlistResponse.ok) {
           const wishlistData = await wishlistResponse.json()
-          setWishlist(wishlistData)
+          setWishlist(Array.isArray(wishlistData) ? wishlistData : wishlistData.items || [])
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load profile')
@@ -175,6 +176,42 @@ export default function ProfilePage() {
       ...formData,
       [e.target.name]: e.target.value,
     })
+  }
+
+  const handleSwitchToSeller = async () => {
+    if (!confirm('Switch to Seller Account? You will be able to list and sell products on our platform.')) {
+      return
+    }
+
+    setSwitchingRole(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const response = await fetch('/api/profile/switch-to-seller', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to switch to seller account')
+      }
+
+      const data = await response.json()
+      setProfile({ ...profile!, role: 'seller' })
+      setSuccess('Successfully switched to seller account! Redirecting to seller dashboard...')
+      
+      setTimeout(() => {
+        router.push('/seller/dashboard')
+      }, 2000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to switch to seller account')
+    } finally {
+      setSwitchingRole(false)
+    }
   }
 
   if (loading) {
@@ -368,6 +405,60 @@ export default function ProfilePage() {
                     </Select>
                     <p className="text-xs text-muted-foreground">Choose your preferred color theme</p>
                   </div>
+
+                  {/* Seller Account Toggle */}
+                  {profile.role === 'customer' && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 p-4 space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Store className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-blue-900 dark:text-blue-100">Become a Seller</h3>
+                          <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                            Start selling your products on our platform. You&apos;ll get access to the seller dashboard, 
+                            inventory management, and analytics tools.
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleSwitchToSeller}
+                        disabled={switchingRole}
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                      >
+                        {switchingRole ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Switching...
+                          </>
+                        ) : (
+                          <>
+                            <Store className="mr-2 h-4 w-4" />
+                            Switch to Seller Account
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
+                  {profile.role === 'seller' && (
+                    <div className="rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800 p-4">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
+                        <div>
+                          <h3 className="font-semibold text-green-900 dark:text-green-100">Seller Account Active</h3>
+                          <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                            You have access to the seller dashboard and can manage your products and orders.
+                          </p>
+                          <Link href="/seller/dashboard" className="inline-block mt-2">
+                            <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-100 dark:hover:bg-green-900">
+                              <Package className="mr-2 h-3 w-3" />
+                              Go to Seller Dashboard
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex gap-3 pt-4">
                     <Button type="submit" disabled={saving} className="flex-1">
