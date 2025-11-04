@@ -35,15 +35,14 @@ export default function ProductTemplatesPage() {
   const [templateToDelete, setTemplateToDelete] = useState<number | null>(null)
 
   useEffect(() => {
+    const loadTemplates = () => {
+      const stored = localStorage.getItem('product_templates')
+      if (stored) {
+        setTemplates(JSON.parse(stored))
+      }
+    }
     loadTemplates()
   }, [])
-
-  const loadTemplates = () => {
-    const stored = localStorage.getItem('product_templates')
-    if (stored) {
-      setTemplates(JSON.parse(stored))
-    }
-  }
 
   const handleDeleteTemplate = () => {
     if (templateToDelete !== null) {

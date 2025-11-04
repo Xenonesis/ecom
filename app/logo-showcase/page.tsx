@@ -4,6 +4,7 @@ import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { Moon, Sun, Monitor } from "lucide-react";
+import Link from "next/link";
 
 export default function LogoShowcasePage() {
   const { theme, setTheme } = useTheme();
@@ -199,7 +200,7 @@ export default function LogoShowcasePage() {
         {/* Back to Home */}
         <div className="text-center mt-12">
           <Button asChild size="lg">
-            <a href="/">Back to Home</a>
+            <Link href="/">Back to Home</Link>
           </Button>
         </div>
       </div>

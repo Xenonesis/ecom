@@ -10,11 +10,12 @@ interface LogoProps {
 }
 
 export function Logo({ className = "", variant = "full", size = 40 }: LogoProps) {
-  const { theme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Determine which theme to use
