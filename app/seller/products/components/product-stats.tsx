@@ -25,8 +25,8 @@ export default function ProductStats({ products }: ProductStatsProps) {
       label: 'Total Products',
       value: totalProducts,
       icon: Package,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'Total Inventory Value',

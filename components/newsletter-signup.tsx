@@ -25,7 +25,7 @@ export function NewsletterSignup() {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20">
+    <Card className="bg-gradient-to-br from-primary/5 via-primary/3 to-background border-primary/10">
       <CardContent className="p-8">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <div className="flex-shrink-0">

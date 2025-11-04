@@ -32,7 +32,7 @@ export function useNotification() {
           variant === 'success' ? 'text-green-500' :
           variant === 'error' ? 'text-red-500' :
           variant === 'warning' ? 'text-yellow-500' :
-          'text-blue-500'
+          'text-primary'
         }`} />
       ) : undefined,
     })

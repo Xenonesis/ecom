@@ -44,7 +44,7 @@ export default async function Home() {
       {/* Special Offers Banner */}
       <section className="container mx-auto px-4 pb-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
+          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary/80 p-6 text-primary-foreground">
             <Sparkles className="absolute -right-4 -top-4 h-24 w-24 opacity-20" />
             <div className="relative">
               <h3 className="text-2xl font-bold mb-2">Flash Sale</h3>
@@ -54,7 +54,7 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white">
+          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-accent to-accent/80 p-6 text-accent-foreground">
             <TrendingUp className="absolute -right-4 -top-4 h-24 w-24 opacity-20" />
             <div className="relative">
               <h3 className="text-2xl font-bold mb-2">New Arrivals</h3>
@@ -64,7 +64,7 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-green-500 to-green-600 p-6 text-white sm:col-span-2 lg:col-span-1">
+          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-success to-success/80 p-6 text-success-foreground sm:col-span-2 lg:col-span-1">
             <Award className="absolute -right-4 -top-4 h-24 w-24 opacity-20" />
             <div className="relative">
               <h3 className="text-2xl font-bold mb-2">Best Sellers</h3>
@@ -159,7 +159,7 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="border-t bg-linear-to-br from-primary to-purple-600 py-16 text-white">
+      <section className="border-t bg-gradient-to-br from-primary to-primary/60 py-16 text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <Zap className="mx-auto h-12 w-12 mb-6" />
           <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Start Selling Today</h2>

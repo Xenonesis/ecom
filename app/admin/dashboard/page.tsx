@@ -118,16 +118,16 @@ export default function AdminDashboard() {
       value: stats.totalOrders.toString(),
       icon: ShoppingCart,
       trend: '+8.2%',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Total Products',
       value: stats.totalProducts.toString(),
       icon: Package,
       trend: '+3.1%',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
     },
     {
       title: 'Total Users',
@@ -165,8 +165,8 @@ export default function AdminDashboard() {
       title: "Today's Revenue",
       value: `₹${stats.todayRevenue.toLocaleString()}`,
       icon: TrendingUp,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
   ]
 
@@ -285,14 +285,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <Package className="h-5 w-5 text-blue-600" />
+                <Package className="h-5 w-5 text-primary" />
                 <div className="flex-1">
                   <p className="text-sm font-medium">New product added</p>
                   <p className="text-xs text-muted-foreground">15 minutes ago</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <Users className="h-5 w-5 text-purple-600" />
+                <Users className="h-5 w-5 text-accent" />
                 <div className="flex-1">
                   <p className="text-sm font-medium">New user registered</p>
                   <p className="text-xs text-muted-foreground">1 hour ago</p>

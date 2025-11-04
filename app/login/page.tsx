@@ -203,20 +203,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-purple-500/5 to-background relative overflow-hidden">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-primary/3 to-background relative overflow-hidden">
       {/* Enhanced background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-primary/15 to-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
       </div>
 
       {/* Floating geometric shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-4 h-4 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}></div>
-        <div className="absolute top-40 right-32 w-6 h-6 bg-purple-500/30 rounded-full animate-bounce" style={{ animationDelay: '2s', animationDuration: '4s' }}></div>
-        <div className="absolute bottom-32 left-1/4 w-3 h-3 bg-pink-500/30 rounded-full animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2.5s' }}></div>
-        <div className="absolute bottom-20 right-20 w-5 h-5 bg-blue-500/30 rounded-full animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}></div>
+        <div className="absolute top-40 right-32 w-6 h-6 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '2s', animationDuration: '4s' }}></div>
+        <div className="absolute bottom-32 left-1/4 w-3 h-3 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2.5s' }}></div>
+        <div className="absolute bottom-20 right-20 w-5 h-5 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}></div>
       </div>
 
       <div className="w-full max-w-6xl animate-fadeIn relative z-10">
@@ -225,7 +225,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md mx-auto lg:mx-0">
         {/* Logo/Brand */}
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
             <ShoppingBag className="h-8 w-8 text-primary" />
             ShopHub
           </Link>
@@ -311,7 +311,7 @@ export default function LoginPage() {
                             checkPasswordStrength(password).strength <= 1 ? 'bg-red-500' :
                             checkPasswordStrength(password).strength <= 2 ? 'bg-orange-500' :
                             checkPasswordStrength(password).strength <= 3 ? 'bg-yellow-500' :
-                            checkPasswordStrength(password).strength <= 4 ? 'bg-blue-500' : 'bg-green-500'
+                            checkPasswordStrength(password).strength <= 4 ? 'bg-primary' : 'bg-success'
                           }`}
                           style={{ width: `${(checkPasswordStrength(password).strength / 5) * 100}%` }}
                         ></div>
@@ -320,7 +320,7 @@ export default function LoginPage() {
                         checkPasswordStrength(password).strength <= 1 ? 'text-red-500' :
                         checkPasswordStrength(password).strength <= 2 ? 'text-orange-500' :
                         checkPasswordStrength(password).strength <= 3 ? 'text-yellow-500' :
-                        checkPasswordStrength(password).strength <= 4 ? 'text-blue-500' : 'text-green-500'
+                        checkPasswordStrength(password).strength <= 4 ? 'text-primary' : 'text-success'
                       }`}>
                         {checkPasswordStrength(password).strength <= 1 ? 'Weak' :
                          checkPasswordStrength(password).strength <= 2 ? 'Fair' :
@@ -426,7 +426,7 @@ export default function LoginPage() {
           {/* Feature Showcase - Hidden on mobile, visible on large screens */}
           <div className="hidden lg:block space-y-8">
             <div className="text-center lg:text-left">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-4">
+              <h2 className="text-4xl font-bold text-primary mb-4">
                 Welcome Back to ShopHub
               </h2>
               <p className="text-xl text-muted-foreground mb-8">
@@ -446,8 +446,8 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300 animate-float" style={{ animationDelay: '1s' }}>
-                <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                  <Package className="h-6 w-6 text-purple-500" />
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Package className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg mb-1">Fast Delivery</h3>

@@ -75,11 +75,11 @@ export default function TrackOrderPage() {
       case 'Order Confirmed':
         return <CheckCircle className="h-6 w-6 text-green-500" />
       case 'Order Packed':
-        return <Package className="h-6 w-6 text-blue-500" />
+        return <Package className="h-6 w-6 text-primary" />
       case 'Picked Up':
         return <Truck className="h-6 w-6 text-orange-500" />
       case 'In Transit':
-        return <Truck className="h-6 w-6 text-blue-500" />
+        return <Truck className="h-6 w-6 text-primary" />
       case 'Out for Delivery':
         return <Truck className="h-6 w-6 text-green-500" />
       case 'Delivered':

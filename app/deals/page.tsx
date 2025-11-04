@@ -115,7 +115,7 @@ export default function DealsPage() {
       </Card>
 
       {/* Hero Section */}
-      <div className="mb-8 rounded-lg bg-linear-to-r from-primary to-purple-600 p-8 text-white">
+      <div className="mb-8 rounded-lg bg-gradient-to-r from-primary to-primary/60 p-8 text-primary-foreground">
         <div className="flex items-center gap-3 mb-4">
           <Zap className="h-10 w-10" />
           <h1 className="text-3xl font-bold sm:text-4xl">Hot Deals & Discounts</h1>

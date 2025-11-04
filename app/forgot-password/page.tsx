@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md animate-fadeIn">
           {/* Logo/Brand */}
           <div className="mb-8 text-center">
-            <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
               <ShoppingBag className="h-8 w-8 text-primary" />
               ShopHub
             </Link>
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md animate-fadeIn">
         {/* Logo/Brand */}
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
             <ShoppingBag className="h-8 w-8 text-primary" />
             ShopHub
           </Link>

@@ -107,7 +107,7 @@ export function Notifications() {
                   </div>
                   {!notification.is_read && (
                     <div className="ml-2">
-                      <div className="h-2 w-2 bg-blue-500 rounded-full" />
+                      <div className="h-2 w-2 bg-primary rounded-full" />
                     </div>
                   )}
                 </div>

@@ -84,7 +84,7 @@ export default function EnhancedDealsPage() {
 
       {/* Hero Section */}
       <div className="mb-12">
-        <Card className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+        <Card className="bg-gradient-to-r from-destructive to-warning text-white border-0">
           <CardContent className="p-8 md:p-12">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
@@ -199,7 +199,7 @@ export default function EnhancedDealsPage() {
       </Tabs>
 
       {/* Deal Alert */}
-      <Card className="mt-12 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
+      <Card className="mt-12 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
         <CardContent className="p-8 text-center">
           <h3 className="text-2xl font-bold mb-2">Don't Miss Out!</h3>
           <p className="text-muted-foreground mb-4">

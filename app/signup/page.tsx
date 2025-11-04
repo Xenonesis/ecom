@@ -35,7 +35,7 @@ export default function SignupPage() {
     
     if (strength <= 2) return { strength, label: 'Weak', color: 'bg-red-500', checks }
     if (strength <= 3) return { strength, label: 'Fair', color: 'bg-yellow-500', checks }
-    if (strength <= 4) return { strength, label: 'Good', color: 'bg-blue-500', checks }
+    if (strength <= 4) return { strength, label: 'Good', color: 'bg-primary', checks }
     return { strength, label: 'Strong', color: 'bg-green-500', checks }
   }, [password])
 
@@ -136,7 +136,7 @@ export default function SignupPage() {
       <div className="w-full max-w-md animate-fadeIn">
         {/* Logo/Brand */}
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          <Link href="/" className="inline-flex items-center gap-2 text-3xl font-bold text-primary">
             <ShoppingBag className="h-8 w-8 text-primary" />
             ShopHub
           </Link>
@@ -213,7 +213,7 @@ export default function SignupPage() {
                       <span className={`font-semibold ${
                         passwordStrength.label === 'Weak' ? 'text-red-500' :
                         passwordStrength.label === 'Fair' ? 'text-yellow-500' :
-                        passwordStrength.label === 'Good' ? 'text-blue-500' :
+                        passwordStrength.label === 'Good' ? 'text-primary' :
                         'text-green-500'
                       }`}>
                         {passwordStrength.label}
@@ -253,8 +253,8 @@ export default function SignupPage() {
                   </div>
                 )}
               </div>
-              <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 p-3">
-                <p className="text-xs text-blue-700 dark:text-blue-300">
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <p className="text-xs text-primary/80">
                   <strong>Note:</strong> You can upgrade to a seller account later from your profile settings to start selling products.
                 </p>
               </div>

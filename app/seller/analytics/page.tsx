@@ -130,8 +130,8 @@ export default function SellerAnalyticsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-blue-50">
-                <Eye className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Eye className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Views</p>
@@ -144,8 +144,8 @@ export default function SellerAnalyticsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-purple-50">
-                <ShoppingCart className="h-5 w-5 text-purple-600" />
+              <div className="p-2 rounded-lg bg-accent/10">
+                <ShoppingCart className="h-5 w-5 text-accent" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Sales</p>
@@ -249,11 +249,11 @@ export default function SellerAnalyticsPage() {
               <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <div className={`p-2 rounded-lg ${
                   activity.type === 'sale' ? 'bg-green-50' :
-                  activity.type === 'view' ? 'bg-blue-50' :
+                  activity.type === 'view' ? 'bg-primary/10' :
                   'bg-yellow-50'
                 }`}>
                   {activity.type === 'sale' && <ShoppingCart className="h-4 w-4 text-green-600" />}
-                  {activity.type === 'view' && <Eye className="h-4 w-4 text-blue-600" />}
+                  {activity.type === 'view' && <Eye className="h-4 w-4 text-primary" />}
                   {activity.type === 'review' && <BarChart3 className="h-4 w-4 text-yellow-600" />}
                 </div>
                 <div className="flex-1">

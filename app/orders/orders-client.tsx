@@ -68,7 +68,7 @@ export default function OrdersClientPage() {
       case 'pending':
         return <Clock className="h-5 w-5 text-yellow-500" />
       case 'shipped':
-        return <Truck className="h-5 w-5 text-blue-500" />
+        return <Truck className="h-5 w-5 text-primary" />
       case 'delivered':
         return <CheckCircle className="h-5 w-5 text-green-500" />
       case 'cancelled':

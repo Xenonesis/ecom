@@ -134,16 +134,16 @@ export default function SellerDashboard() {
       value: stats.totalOrders.toString(),
       icon: ShoppingCart,
       trend: `${stats.pendingOrders} pending`,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Total Products',
       value: stats.totalProducts.toString(),
       icon: Package,
       trend: `${stats.activeProducts} active`,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
     },
     {
       title: 'Average Rating',
@@ -178,8 +178,8 @@ export default function SellerDashboard() {
       value: stats.viewsThisMonth.toLocaleString(),
       description: 'Total views this month',
       icon: Eye,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
   ]
 

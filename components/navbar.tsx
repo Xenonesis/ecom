@@ -118,11 +118,11 @@ export function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link href="/" className="group flex items-center gap-2 text-2xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-200">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/25 transition-shadow">
-                  <ShoppingCart className="h-5 w-5 text-white" />
+              <Link href="/" className="group flex items-center gap-2 text-2xl font-bold text-primary hover:scale-105 transition-transform duration-200">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/25 transition-shadow">
+                  <ShoppingCart className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                <span className="text-primary">
                   ShopHub
                 </span>
               </Link>

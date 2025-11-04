@@ -408,12 +408,12 @@ export default function ProfilePage() {
 
                   {/* Seller Account Toggle */}
                   {profile.role === 'customer' && (
-                    <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 p-4 space-y-3">
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
                       <div className="flex items-start gap-3">
-                        <Store className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <Store className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                         <div className="flex-1">
-                          <h3 className="font-semibold text-blue-900 dark:text-blue-100">Become a Seller</h3>
-                          <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                          <h3 className="font-semibold text-primary">Become a Seller</h3>
+                          <p className="text-sm text-primary/80 mt-1">
                             Start selling your products on our platform. You&apos;ll get access to the seller dashboard, 
                             inventory management, and analytics tools.
                           </p>
@@ -423,7 +423,7 @@ export default function ProfilePage() {
                         type="button"
                         onClick={handleSwitchToSeller}
                         disabled={switchingRole}
-                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        className="w-full"
                       >
                         {switchingRole ? (
                           <>
