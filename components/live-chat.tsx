@@ -102,7 +102,7 @@ export function LiveChat() {
           : 'bottom-6 right-6 w-96 h-[600px] max-h-[80vh]'
       }`}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 border-b bg-primary text-primary-foreground">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 border-b bg-background dark:bg-white text-foreground dark:text-black">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
           Live Chat Support
@@ -112,7 +112,7 @@ export function LiveChat() {
             variant="ghost"
             size="icon"
             onClick={() => setIsMinimized(!isMinimized)}
-            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            className="h-8 w-8 text-foreground dark:text-black hover:bg-foreground/20 dark:hover:bg-black/20"
           >
             {isMinimized ? (
               <Maximize2 className="h-4 w-4" />
@@ -124,7 +124,7 @@ export function LiveChat() {
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(false)}
-            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            className="h-8 w-8 text-foreground dark:text-black hover:bg-foreground/20 dark:hover:bg-black/20"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -133,7 +133,7 @@ export function LiveChat() {
 
       {!isMinimized && (
         <>
-          <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(600px-140px)] max-h-[calc(80vh-140px)]">
+          <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(600px-140px)] max-h-[calc(80vh-140px)] bg-background/95 backdrop-blur-sm">
             {messages.map((message) => (
               <div
                 key={message.id}
