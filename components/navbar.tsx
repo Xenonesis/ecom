@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { AdvancedSearch } from '@/components/advanced-search'
 import { Notifications } from '@/components/notifications'
+import { MegaMenu } from '@/components/mega-menu'
 import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
 import { createClient } from '@/lib/supabase/client'
@@ -113,22 +114,27 @@ export function Navbar() {
 
   return (
     <>
-      <nav className={`sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-shadow ${scrolled ? 'shadow-md' : ''}`}>
+      <nav className={`sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-all duration-300 ${scrolled ? 'shadow-lg border-primary/10' : ''}`}>
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link href="/" className="text-2xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                ShopHub
+              <Link href="/" className="group flex items-center gap-2 text-2xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-200">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/25 transition-shadow">
+                  <ShoppingCart className="h-5 w-5 text-white" />
+                </div>
+                <span className="bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                  ShopHub
+                </span>
               </Link>
-              <div className="hidden lg:flex items-center gap-6">
-                <Link href="/categories" className="text-sm font-medium hover:text-primary transition-colors">
-                  Categories
-                </Link>
-                <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
+              <div className="hidden lg:flex items-center gap-1">
+                <MegaMenu />
+                <Link href="/products" className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2 px-3 rounded-md hover:bg-accent/50 group">
                   Products
+                  <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full group-hover:left-0"></span>
                 </Link>
-                <Link href="/deals" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/deals" className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2 px-3 rounded-md hover:bg-accent/50 group">
                   Deals
+                  <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full group-hover:left-0"></span>
                 </Link>
               </div>
             </div>
@@ -137,26 +143,26 @@ export function Navbar() {
               <AdvancedSearch />
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
                 size="icon"
                 onClick={() => {
                   if (theme === 'light') setTheme('dark')
                   else if (theme === 'dark') setTheme('system')
                   else setTheme('light')
                 }}
-                className="hover:bg-accent"
+                className="hover:bg-accent hover:scale-110 transition-all duration-200"
                 title={`Current theme: ${theme || 'system'}`}
               >
                 {getThemeIcon()}
               </Button>
 
               <Link href="/cart" className="hidden sm:block">
-                <Button variant="ghost" size="icon" className="relative hover:bg-accent">
-                  <ShoppingCart className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="relative hover:bg-accent hover:scale-110 transition-all duration-200 group">
+                  <ShoppingCart className="h-5 w-5 group-hover:text-primary transition-colors" />
                   {totalItems > 0 && (
-                    <Badge className="absolute -right-1 -top-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                    <Badge className="absolute -right-1 -top-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs animate-pulse bg-primary hover:bg-primary/90">
                       {totalItems}
                     </Badge>
                   )}
@@ -166,13 +172,13 @@ export function Navbar() {
               {user && <Notifications />}
 
               {user ? (
-                <DropdownMenu
-                  trigger={
-                    <Button variant="ghost" size="icon" className="hover:bg-accent">
-                      <User className="h-5 w-5" />
-                    </Button>
-                  }
-                >
+                 <DropdownMenu
+                   trigger={
+                     <Button variant="ghost" size="icon" className="hover:bg-accent hover:scale-110 transition-all duration-200 group">
+                       <User className="h-5 w-5 group-hover:text-primary transition-colors" />
+                     </Button>
+                   }
+                 >
                   <div className="px-2 py-1.5 text-sm font-semibold">My Account</div>
                   <DropdownMenuSeparator />
                   {userRole === 'admin' && (
@@ -218,18 +224,18 @@ export function Navbar() {
               ) : (
                 <div className="hidden md:flex gap-2">
                   <Link href="/login">
-                    <Button variant="ghost">Sign In</Button>
+                    <Button variant="ghost" className="hover:bg-accent hover:scale-105 transition-all duration-200">Sign In</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button>Sign Up</Button>
+                    <Button className="hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg">Sign Up</Button>
                   </Link>
                 </div>
               )}
 
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="lg:hidden"
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden hover:bg-accent hover:scale-110 transition-all duration-200"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -246,57 +252,68 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-40 bg-background lg:hidden animate-slideIn">
+        <div className="fixed inset-0 top-16 z-40 bg-background/95 backdrop-blur-lg lg:hidden animate-slideIn border-t border-border/50">
           <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col space-y-4">
-              <Link href="/products" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+            <div className="flex flex-col space-y-2">
+              <Link href="/products" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200" onClick={() => setMobileMenuOpen(false)}>
                 Products
               </Link>
-              <Link href="/categories" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/categories" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200" onClick={() => setMobileMenuOpen(false)}>
                 Categories
               </Link>
-              <Link href="/deals" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/deals" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200" onClick={() => setMobileMenuOpen(false)}>
                 Deals
               </Link>
-              <Link href="/cart" className="text-lg font-medium hover:text-primary flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                Cart {totalItems > 0 && <Badge>{totalItems}</Badge>}
+              <Link href="/cart" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                <ShoppingCart className="h-5 w-5" />
+                Cart {totalItems > 0 && <Badge className="bg-primary">{totalItems}</Badge>}
               </Link>
               <hr className="border-border" />
               {user ? (
                 <>
-                  <Link href="/profile" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
-                    My Profile
-                  </Link>
-                  <Link href="/orders" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
-                    My Orders
-                  </Link>
-                  <Link href="/wishlist" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
-                    Wishlist
-                  </Link>
-                  {userRole === 'seller' && (
-                    <Link href="/seller" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
-                      Seller Dashboard
+                  <div className="border-t border-border/50 pt-4 mt-4">
+                    <div className="text-sm font-semibold text-muted-foreground mb-3 px-4">Account</div>
+                    <Link href="/profile" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200 flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
+                      <User className="h-5 w-5" />
+                      My Profile
                     </Link>
-                  )}
-                  {userRole === 'admin' && (
-                    <Link href="/admin" className="text-lg font-medium hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
-                      Admin Dashboard
+                    <Link href="/orders" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200 flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
+                      <Package className="h-5 w-5" />
+                      My Orders
                     </Link>
-                  )}
-                  <Button variant="outline" onClick={handleLogout} className="w-full justify-start">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </Button>
+                    <Link href="/wishlist" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200 flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
+                      <Heart className="h-5 w-5" />
+                      Wishlist
+                    </Link>
+                    {userRole === 'seller' && (
+                      <Link href="/seller" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200 flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
+                        <Package className="h-5 w-5" />
+                        Seller Dashboard
+                      </Link>
+                    )}
+                    {userRole === 'admin' && (
+                      <Link href="/admin" className="text-lg font-medium hover:text-primary hover:bg-accent/50 py-3 px-4 rounded-lg transition-all duration-200 flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
+                        <Settings className="h-5 w-5" />
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <div className="pt-2">
+                      <Button variant="outline" onClick={handleLogout} className="w-full justify-start hover:bg-destructive hover:text-destructive-foreground transition-all duration-200">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
                 </>
               ) : (
-                <>
+                <div className="border-t border-border/50 pt-4 mt-4 space-y-3">
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Sign In</Button>
+                    <Button variant="outline" className="w-full hover:bg-accent transition-all duration-200">Sign In</Button>
                   </Link>
                   <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Sign Up</Button>
+                    <Button className="w-full hover:scale-105 transition-all duration-200">Sign Up</Button>
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </div>

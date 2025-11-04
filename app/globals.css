@@ -157,3 +157,22 @@ body {
 :focus-visible {
   @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
 }
+
+/* Additional animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Enhanced shadow utilities */
+.shadow-3xl {
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
