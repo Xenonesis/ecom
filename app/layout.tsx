@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
@@ -31,6 +31,9 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/manifest',
+};
+
+export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#7C3AED' },
     { media: '(prefers-color-scheme: dark)', color: '#8B5CF6' },
