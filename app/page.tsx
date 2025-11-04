@@ -11,7 +11,7 @@ import { Database } from '@/lib/supabase/database.types'
 
 export default async function Home() {
   const supabase = await createServerClient()
-  
+
   // Fetch featured products
   const { data } = await supabase
     .from('products')
@@ -88,7 +88,7 @@ export default async function Home() {
               <h3 className="mb-2 font-semibold text-lg">Free Shipping</h3>
               <p className="text-sm text-muted-foreground">Free delivery on all orders over ₹500</p>
             </div>
-            
+
             <div className="group relative overflow-hidden rounded-xl bg-background p-6 shadow-sm transition-all hover:shadow-lg">
               <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
                 <Shield className="h-6 w-6 text-primary" />
@@ -96,7 +96,7 @@ export default async function Home() {
               <h3 className="mb-2 font-semibold text-lg">Secure Payment</h3>
               <p className="text-sm text-muted-foreground">100% secure and encrypted transactions</p>
             </div>
-            
+
             <div className="group relative overflow-hidden rounded-xl bg-background p-6 shadow-sm transition-all hover:shadow-lg">
               <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
                 <Award className="h-6 w-6 text-primary" />
@@ -104,7 +104,7 @@ export default async function Home() {
               <h3 className="mb-2 font-semibold text-lg">Quality Assured</h3>
               <p className="text-sm text-muted-foreground">Only verified sellers and authentic products</p>
             </div>
-            
+
             <div className="group relative overflow-hidden rounded-xl bg-background p-6 shadow-sm transition-all hover:shadow-lg">
               <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
                 <HeadphonesIcon className="h-6 w-6 text-primary" />
@@ -146,7 +146,7 @@ export default async function Home() {
               </Link>
             </div>
           )}
-          
+
           <div className="mt-8 text-center sm:hidden">
             <Link href="/products">
               <Button variant="outline" className="w-full">

@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '@/compone
 import { AdvancedSearch } from '@/components/advanced-search'
 import { Notifications } from '@/components/notifications'
 import { MegaMenu } from '@/components/mega-menu'
+import { Logo } from '@/components/logo'
 import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
 import { createClient } from '@/lib/supabase/client'
@@ -118,13 +119,8 @@ export function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link href="/" className="group flex items-center gap-2 text-2xl font-bold text-primary hover:scale-105 transition-transform duration-200">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/25 transition-shadow">
-                  <ShoppingCart className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span className="text-primary">
-                  ShopHub
-                </span>
+              <Link href="/" className="hover:opacity-90 transition-opacity">
+                <Logo variant="full" size={32} />
               </Link>
               <div className="hidden lg:flex items-center gap-1">
                 <MegaMenu />

@@ -1,0 +1,43 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="50%" stop-color="#DB2777" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle for better visibility -->
+  <circle cx="256" cy="256" r="256" fill="#F9FAFB" />
+  
+  <!-- Shopping bag base -->
+  <path
+    d="M128 179 L128 435 C128 460 143 476 169 476 L343 476 C369 476 384 460 384 435 L384 179"
+    stroke="url(#logoGradient)"
+    stroke-width="30"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+  
+  <!-- Shopping bag handles -->
+  <path
+    d="M179 179 C179 128 205 77 256 77 C307 77 333 128 333 179"
+    stroke="url(#logoGradient)"
+    stroke-width="30"
+    stroke-linecap="round"
+    fill="none"
+  />
+  
+  <!-- Hub connection dots -->
+  <circle cx="256" cy="282" r="20" fill="#7C3AED" />
+  <circle cx="194" cy="333" r="15" fill="#DB2777" />
+  <circle cx="318" cy="333" r="15" fill="#2563EB" />
+  <circle cx="256" cy="384" r="15" fill="#7C3AED" />
+  
+  <!-- Connection lines -->
+  <line x1="256" y1="282" x2="194" y2="333" stroke="#7C3AED" stroke-width="10" opacity="0.5" />
+  <line x1="256" y1="282" x2="318" y2="333" stroke="#7C3AED" stroke-width="10" opacity="0.5" />
+  <line x1="194" y1="333" x2="256" y2="384" stroke="#DB2777" stroke-width="10" opacity="0.5" />
+  <line x1="318" y1="333" x2="256" y2="384" stroke="#2563EB" stroke-width="10" opacity="0.5" />
+</svg>

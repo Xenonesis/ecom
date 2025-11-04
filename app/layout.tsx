@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { Logo } from "@/components/logo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,6 +21,20 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "ShopHub - Modern E-Commerce Platform",
   description: "Shop the best products from verified sellers",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/manifest',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#7C3AED' },
+    { media: '(prefers-color-scheme: dark)', color: '#8B5CF6' },
+  ],
 };
 
 export default function RootLayout({
@@ -48,8 +63,8 @@ export default function RootLayout({
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
               {/* Brand */}
               <div className="lg:col-span-2">
-                <Link href="/" className="text-2xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  ShopHub
+                <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
+                  <Logo variant="full" size={36} />
                 </Link>
                 <p className="mt-4 text-sm text-muted-foreground max-w-xs">
                   Your trusted marketplace for quality products from verified sellers. Shop with confidence and enjoy exceptional service.
